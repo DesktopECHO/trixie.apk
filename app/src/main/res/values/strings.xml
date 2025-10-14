@@ -156,7 +156,7 @@
 
     <!-- INSTALL -->
     <string name="title_install_dialog">Install</string>
-    <string name="message_install_dialog">Start installation of GNU/Linux distribution?</string>
+    <string name="message_install_dialog">Start Debian installation?</string>
     <!-- CONFIGURE -->
     <string name="title_configure_dialog">Configure</string>
     <string name="message_configure_dialog">Start configuration of the container?</string>
@@ -338,8 +338,8 @@
     <!-- FB_DEV -->
     <string name="title_fb_dev_preference">Video device</string>
     <string name="dialog_title_fb_dev_preference">FB: video device path</string>
-    <!-- FB_INPUT -->
     <string name="title_fb_input_preference">Input device</string>
+    <!-- FB_INPUT -->
     <string name="dialog_title_fb_input_preference">FB: input device path</string>
     <!-- FB_ARGS -->
     <string name="title_fb_args_preference">X options</string>
@@ -352,9 +352,26 @@
     <string name="summary_fb_refresh_preference">Force refresh framebuffer</string>
 
     <!-- HELP -->
-    <string name="help_text">\n<b>Help</b>\n\nThis application installs the selected GNU/Linux distribution and executes it in a chroot-container.\n\nProcedure:\n1. Get superuser privileges (root).\n2. Check the connection to Internet.\n3. Specify the installation options.\n4. Start the installation (\"Menu => Install\").\n5. Wait until the installation is complete.\n6. Tap \"START\" button to run the container.\n7. Connect to the container through CLI, SSH, VNC, or others.\n\nFor more information, see \"About\".</string>
+    <string name="help_text">
+\nThis application installs Debian 13\n(Trixie) in a chroot container.\n\n\n
+To deploy a new Linux instance:\n\n
+"  1. Get superuser privileges (root)."\n\n
+"  2. Verify your Internet connectivity."\n\n
+"  3. Start the installation:"\n
+"     Tap the options menu at the top right"\n
+"     (three dots ⋮ ) and \"Install\"."\n\n
+"  4. Wait a few minutes for the"\n
+"     installation to complete."\n\n
+"  5. Tap the \"START\" button"\n
+"     to run the container."\n\n
+" The desktop environment will appear"\n
+" shortly after the container is started."\n\n\n
+" To start/reconnect a desktop session:"\n\n
+"  - Tap the main menu at the top left"\n
+"    (Three dashes ≡ ) and \"Desktop\""
+    </string>
     <!-- ABOUT -->
-    <string name="about_text">This application installs the selected GNU/Linux distribution and executes it in a chroot-container.\n\nFor more information see <a href="https://github.com/desktopecho/trixie">project page</a>, <a href="http://4pda.ru/forum/index.php?showtopic=378043">forum</a> or <a href="https://desktopecho.github.io">developer site</a>.\n\n&#169; 2012&#8211;2019 Anton Skshidlevsky, GPLv3</string>
+    <string name="about_text">This application installs Debian 13\nin a chroot container.\n\nFor more information visit the <a href="https://github.com/desktopecho/trixie.apk">project page</a>.\n\n&#169; 2012&#8211;2019 Anton Skshidlevsky, GPLv3.\n&#169; 2021&#8211;2025, DesktopECHO, GPLv3</string>
     <string name="service_notification_channel_name">Services</string>
     <string name="service_notification_channel_description">Channel to display service notifications</string>
 

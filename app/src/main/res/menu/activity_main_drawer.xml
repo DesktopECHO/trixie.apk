@@ -7,13 +7,9 @@
             android:icon="@drawable/ic_computer_24dp"
             android:title="@string/nav_profiles" />
         <item
-            android:id="@+id/nav_repository"
-            android:icon="@drawable/ic_search_24dp"
-            android:title="@string/nav_repository" />
-        <item
             android:id="@+id/nav_terminal"
             android:icon="@drawable/ic_exit_to_app_24dp"
-            android:title="@string/nav_terminal" />
+            android:title="Desktop" />
     </group>
 
     <group android:id="@+id/menu_bottom">

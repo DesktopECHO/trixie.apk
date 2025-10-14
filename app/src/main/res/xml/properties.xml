@@ -2,32 +2,6 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory android:title="@string/bootstrap_preferences">
-        <ListPreference
-            android:defaultValue="@string/distrib"
-            android:dialogTitle="@string/dialog_title_distrib_preference"
-            android:entries="@array/distrib_entries"
-            android:entryValues="@array/distrib_values"
-            android:key="distrib"
-            android:summary="@string/distrib"
-            android:title="@string/title_distrib_preference" />
-
-        <ListPreference
-            android:defaultValue="@string/arch"
-            android:dialogTitle="@string/dialog_title_arch_preference"
-            android:entries="@array/debian_arch_values"
-            android:entryValues="@array/debian_arch_values"
-            android:key="arch"
-            android:summary="@string/arch"
-            android:title="@string/title_arch_preference" />
-
-        <ListPreference
-            android:defaultValue="@string/suite"
-            android:dialogTitle="@string/dialog_title_suite_preference"
-            android:entries="@array/debian_suite_values"
-            android:entryValues="@array/debian_suite_values"
-            android:key="suite"
-            android:summary="@string/suite"
-            android:title="@string/title_suite_preference" />
 
         <EditTextPreference
             android:defaultValue="@string/source_path"
@@ -77,14 +51,6 @@
             android:title="@string/title_user_name_preference" />
 
         <EditTextPreference
-            android:defaultValue="@string/user_password"
-            android:dialogTitle="@string/dialog_title_user_password_preference"
-            android:key="user_password"
-            android:maxLength="8"
-            android:summary="@string/user_password"
-            android:title="@string/title_user_password_preference" />
-
-        <EditTextPreference
             android:defaultValue="@string/privileged_users"
             android:dialogTitle="@string/dialog_title_privileged_users_preference"
             android:key="privileged_users"
@@ -123,32 +89,6 @@
 
     </PreferenceCategory>
 
-    <PreferenceCategory android:title="@string/init_preferences">
-
-        <CheckBoxPreference
-            android:defaultValue="@string/is_init"
-            android:key="is_init"
-            android:summary="@string/summary_is_init_preference"
-            android:title="@string/title_is_init_preference" />
-
-        <ListPreference
-            android:defaultValue="@string/init"
-            android:dependency="is_init"
-            android:dialogTitle="@string/dialog_title_init_preference"
-            android:entries="@array/init_values"
-            android:entryValues="@array/init_values"
-            android:key="init"
-            android:summary="@string/init"
-            android:title="@string/title_init_preference" />
-
-        <PreferenceScreen
-            android:dependency="is_init"
-            android:key="init_properties"
-            android:summary="@string/summary_init_properties_preference"
-            android:title="@string/title_init_properties_preference" />
-
-    </PreferenceCategory>
-
     <PreferenceCategory android:title="@string/mounts_preferences">
 
         <CheckBoxPreference
@@ -162,74 +102,6 @@
             android:key="mounts_editor"
             android:summary="@string/summary_mounts_editor_preference"
             android:title="@string/title_mounts_editor_preference" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory android:title="@string/ssh_preferences">
-
-        <CheckBoxPreference
-            android:defaultValue="@string/is_ssh"
-            android:key="is_ssh"
-            android:summary="@string/summary_is_ssh_preference"
-            android:title="@string/title_is_ssh_preference" />
-
-        <PreferenceScreen
-            android:dependency="is_ssh"
-            android:key="ssh_properties"
-            android:summary="@string/summary_ssh_properties_preference"
-            android:title="@string/title_ssh_properties_preference" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory android:title="@string/pulse_preferences">
-
-        <CheckBoxPreference
-            android:defaultValue="@string/is_pulse"
-            android:key="is_pulse"
-            android:summary="@string/summary_is_pulse_preference"
-            android:title="@string/title_is_pulse_preference" />
-
-        <PreferenceScreen
-            android:dependency="is_pulse"
-            android:key="pulse_properties"
-            android:summary="@string/summary_pulse_properties_preference"
-            android:title="@string/title_pulse_properties_preference" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory android:title="@string/gui_preferences">
-
-        <CheckBoxPreference
-            android:defaultValue="@string/is_gui"
-            android:key="is_gui"
-            android:summary="@string/summary_is_gui_preference"
-            android:title="@string/title_is_gui_preference" />
-
-        <ListPreference
-            android:defaultValue="@string/graphics"
-            android:dependency="is_gui"
-            android:dialogTitle="@string/dialog_title_graphics_preference"
-            android:entries="@array/graphics_entries"
-            android:entryValues="@array/graphics_values"
-            android:key="graphics"
-            android:summary="@string/graphics"
-            android:title="@string/title_graphics_preference" />
-
-        <PreferenceScreen
-            android:dependency="is_gui"
-            android:key="gui_properties"
-            android:summary="@string/summary_gui_properties_preference"
-            android:title="@string/title_gui_properties_preference" />
-
-        <ListPreference
-            android:defaultValue="@string/desktop"
-            android:dependency="is_gui"
-            android:dialogTitle="@string/dialog_title_desktop_preference"
-            android:entries="@array/desktop_entries"
-            android:entryValues="@array/desktop_values"
-            android:key="desktop"
-            android:summary="@string/desktop"
-            android:title="@string/title_desktop_preference" />
 
     </PreferenceCategory>
 

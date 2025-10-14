@@ -1,12 +1,13 @@
 #!/bin/bash
 ################################################################################
 #
-# Trixie Deploy CLI
-# (C) 2012-2025 Anton Skshidlevsky <meefik@gmail.com>, GPLv3
+# Trixie.apk CLI
+# (C) 2012-2019 Anton Skshidlevsky <meefik@gmail.com>, GPLv3
 #
 ################################################################################
 
-VERSION="2.5.1"
+VERSION="1.0.4"
+CURL="/data/data/com.desktopecho.trixie/files/bin/curl"
 setenforce 0 &> /dev/null
 
 ################################################################################
@@ -38,7 +39,7 @@ resolve_ip()
     host="$1"
     OUT=$(ping -n -c1 -W1 "$host" 2>&1)
     ip=$(printf "%s\n" "$OUT" | grep -m1 -oE '([0-9]{1,3}\.){3}[0-9]{1,3}')
-    [ -z "$ip" ] && ip=$(printf "%s\n" "$OUT" | sed -n 's/.*(\([0-9.]\+\)).*/\1/p')                  
+    [ -z "$ip" ] && ip=$(printf "%s\n" "$OUT" | sed -n 's/.*(\([0-9.]\+\)).*/\1/p')
     echo "$ip"
 }
 
@@ -808,24 +809,23 @@ rootfs_import()
     *gz)
         if [ -e "${rootfs_file}" ]; then
             msg "Importing rootfs from tar.gz archive ... "
-            tar xJf "${rootfs_file}" -C "${CHROOT_DIR}"
+            tar xf "${rootfs_file}" -C "${CHROOT_DIR}"
         elif [ -z "${rootfs_file##http*}" ]; then
             msg "Downloading tar.gz archive ... "
             msg -n " "
-                
+
             ob=$(resolve_ip objects.githubusercontent.com) ; cl=$(resolve_ip codeload.github.com) ; ra=$(resolve_ip release-assets.githubusercontent.com) ; gh=$(resolve_ip github.com)
-    
-            OUTFILE="/data/local/tmp/trixie.tgz"
-            CURL="/data/data/com.desktopecho.trixie/files/bin/curl"
+
+            OUTFILE="/data/local/tmp/trixie.tar.gz"
             BLOCKSIZE=$((10*1024*1024))
             HASHES=0
             LAST_HASH=0
-                
+
             # Start curl download in the background (with resume)
             pkill -9 -f "$CURL" ; rm -f "$OUTFILE"
-            "$CURL" -s -k -L --continue-at - --http3 --retry 100 --retry-delay 5 --retry-max-time 0 --retry-all-errors --connect-to objects.githubusercontent.com:443:$ob --connect-to codeload.github.com:443:$cl --connect-to github.com:443:$gh --connect-to release-assets.githubusercontent.com:443:$ra https://github.com/DesktopECHO/trixie.apk/releases/latest/download/trixie.gz -o "$OUTFILE" &
+            "$CURL" -s -k -L --continue-at - --http3 --retry 20 --retry-delay 5 --retry-max-time 0 --retry-all-errors --connect-to objects.githubusercontent.com:443:$ob --connect-to codeload.github.com:443:$cl --connect-to github.com:443:$gh --connect-to release-assets.githubusercontent.com:443:$ra https://github.com/DesktopECHO/trixie.apk/releases/latest/download/trixie.gz -o "$OUTFILE" &
             CURL_PID=$!
-            
+
             # Print hash marks for new data during this run
             while ps | grep -w "$CURL_PID" | grep -v grep >/dev/null; do
                 sleep 5
@@ -834,67 +834,101 @@ rootfs_import()
                     HASHES=$((SIZE / BLOCKSIZE))
                     while [ $LAST_HASH -lt $HASHES ]; do
                         printf '#'
-                        LAST_HASH=$((LAST_HASH + 1))  
+                        LAST_HASH=$((LAST_HASH + 1))
                     done
                 fi
             done
-            
+
             # Extract and cleanup
             msg " "
-            msg "Installing disk image ... "
+            msg "Installing Trixie rootfs ... "
             tar -xJf "$OUTFILE" -C "${CHROOT_DIR}"
             rm -f "$OUTFILE"
         else
             rm -f "$OUTFILE"
             msg "fail"; return 1
-        fi  
+        fi
         is_ok "fail" "done" || return 1
     ;;
     *xz)
-        if [ -e "${rootfs_file}" ]; then                                        
+        if [ -e "${rootfs_file}" ]; then
             msg "Importing rootfs from tar.xz archive ... "
-            tar xJf "${rootfs_file}" -C "${CHROOT_DIR}"                         
-        elif [ -z "${rootfs_file##http*}" ]; then     
+            tar xJf "${rootfs_file}" -C "${CHROOT_DIR}"
+        elif [ -z "${rootfs_file##http*}" ]; then
+            if [ ! -d /data/data/com.microsoft.rdc.androidx ]; then
+            msg "Install RDC ... "
+            PKG="com.microsoft.rdc.androidx"
+            TMP="/data/local/tmp"
+            APK="/data/data/com.desktopecho.trixie/files/rdc.apk"
+            REL="$(getprop ro.build.version.release 2>/dev/null)"
+            MAJOR="$(echo "$REL" | sed -n 's/^\([0-9][0-9]*\).*/\1/p')"
+            [ -z "$MAJOR" ] && { echo "E: bad Android release '$REL'"; exit 1; }
+            [ "$MAJOR" -ge 9 ] && MAJOR=9
+
+            # mapping (sha256, raw URL) b
+            case "$MAJOR" in
+              5) SHA="9fa0308d6c4da30819ffaadcb7c1183ba499159f8c656f5481e6938c4cf6aea9"
+                 URL="https://raw.githubusercontent.com/DesktopECHO/trixie.apk/refs/heads/main/rdc/10.0.7.1066.apk" ;;
+              6) SHA="41203e9641a9e557c19793091a50125cc664041226bc876e6818d6a5a8dd36b0"
+                 URL="https://raw.githubusercontent.com/DesktopECHO/trixie.apk/refs/heads/main/rdc/10.0.9.1114.apk" ;;
+              7) SHA="8e1404ce75e85570af8e3b6ba494f54990204801d54933484adec07ef499681f"
+                 URL="https://raw.githubusercontent.com/DesktopECHO/trixie.apk/refs/heads/main/rdc/10.0.10.1129.apk" ;;
+              8) SHA="5c57411bcb2980f5a4cdc86709a6ba90683ed33585ef90f00e37a56f7b10405f"
+                 URL="https://raw.githubusercontent.com/DesktopECHO/trixie.apk/refs/heads/main/rdc/10.0.13.1160.apk" ;;
+              9) SHA="715de636cf99d131a8e615ff84c2f1cae6126757f46058c9886e1937d6113cc8"
+                 URL="https://raw.githubusercontent.com/DesktopECHO/trixie.apk/refs/heads/main/rdc/10.0.14.1182.apk" ;;
+              *) echo "E: no mapping for Android $MAJOR"; exit 2 ;;
+            esac
+
+            GH_IP="$(nslookup raw.githubusercontent.com 1.1.1.1 2>/dev/null | awk '/^Address [0-9]+: /{ip=$3} END{print ip}')"
+            CT=""
+            [ -n "$GH_IP" ] && CT="--connect-to raw.githubusercontent.com:443:$GH_IP"
+            "$CURL" -s -k -L --continue-at - --http3 --retry 20 --retry-delay 5 --retry-max-time 0 --retry-all-errors $CT --output "$APK" "$URL" || { echo "E: download failed"; rm -f "$APK"; exit 3; }
+
+            ACT="$(busybox sha256sum "$APK" 2>/dev/null | awk '{print $1}')"
+            [ "$ACT" = "$SHA" ] || { echo "E: SHA mismatch"; rm -f "$APK"; exit 4; }
+            pm install -r "$APK" >/dev/null 2>&1 || cmd package install -r "$APK" >/dev/null 2>&1 || { echo "E: install failed"; rm -f "$APK"; exit 5; }
+            rm -f "$APK"
+            fi
             msg "Downloading tar.xz archive ... "
-            msg "[----------------------------------]"
-            msg -n " "         
+            msg "[———————————————————————————————————]"
+            msg -n " "
 
             ob=$(resolve_ip objects.githubusercontent.com) ; cl=$(resolve_ip codeload.github.com) ; ra=$(resolve_ip release-assets.githubusercontent.com) ; gh=$(resolve_ip github.com)
-                                         
+
             OUTFILE="/data/local/tmp/trixie.tar.xz"
-            CURL="/data/data/com.desktopecho.trixie/files/bin/curl"
-            ARCH=$(uname -m); case "$ARCH" in aarch64|arm64) TRIXIEURL="https://github.com/DesktopECHO/trixie.apk/releases/latest/download/trixie.tar.xz" ;; *) TRIXIEURL="https://github.com/DesktopECHO/trixie.apk/releases/latest/download/trixie32.tar.xz" ;; esac
+            ARCH=$(uname -m); case "$ARCH" in aarch64|arm64) TRIXIEURL="https://github.com/DesktopECHO/trixie.apk/releases/latest/download/trixie.tar.xz" ;; *) TRIXIEURL="https://github.com/DesktopECHO/trixie.apk/releases/latest/download/trixie32.tar.xz" && printf "##" ;; esac
             BLOCKSIZE=$((10*1024*1024))
             HASHES=0
             LAST_HASH=0
-                                              
-            # Start curl download in the background (with resume)                                                                                        
-            pkill curl ; rm -f "$OUTFILE"
-            "$CURL" -s -k -L --continue-at - --http3 --retry 100 --retry-delay 5 --retry-max-time 0 --retry-all-errors --connect-to objects.githubusercontent.com:443:$ob --connect-to codeload.github.com:443:$cl --connect-to github.com:443:$gh --connect-to release-assets.githubusercontent.com:443:$ra "$TRIXIEURL" -o "$OUTFILE" &
+
+            # Start curl download in the background (with resume)
+            pkill -f "$CURL" ; rm -f "$OUTFILE"
+            "$CURL" -s -k -L --continue-at - --http3 --retry 20 --retry-delay 5 --retry-max-time 0 --retry-all-errors --connect-to objects.githubusercontent.com:443:$ob --connect-to codeload.github.com:443:$cl --connect-to github.com:443:$gh --connect-to release-assets.githubusercontent.com:443:$ra "$TRIXIEURL" -o "$OUTFILE" &
             CURL_PID=$!
 
-            # Print hash marks for new data during this run          
-            while ps | grep -w "$CURL_PID" | grep -v grep >/dev/null; do                                                
+            # Print hash marks for new data during this run
+            while ps | grep -w "$CURL_PID" | grep -v grep >/dev/null; do
                 sleep 5
-                if [ -f "$OUTFILE" ]; then                   
+                if [ -f "$OUTFILE" ]; then
                     SIZE=$(stat -c %s "$OUTFILE" 2>/dev/null || stat -f %z "$OUTFILE" 2>/dev/null)
                     HASHES=$((SIZE / BLOCKSIZE))
-                    while [ $LAST_HASH -lt $HASHES ]; do                
-                        printf '#'                                                   
-                        LAST_HASH=$((LAST_HASH + 1))                                                   
-                    done                               
-                fi                                                                           
-            done                                                            
-                                           
-            # Extract and cleanup                                      
-            msg " "                                      
-            msg "Installing disk image ... "                   
+                    while [ $LAST_HASH -lt $HASHES ]; do
+                        printf '#'
+                        LAST_HASH=$((LAST_HASH + 1))
+                    done
+                fi
+            done
+
+            # Extract and cleanup
+            msg " "
+            msg "Installing Trixie rootfs ... "
             tar -xJf "$OUTFILE" -C "${CHROOT_DIR}"
         else
-            rm -f "$OUTFILE"                                           
-            msg "fail"; return 1                                                                                                    
-        fi                                                                                                                              
-        is_ok "fail" "done" || return 1                  
+            rm -f "$OUTFILE"
+            msg "fail"; return 1
+        fi
+        is_ok "fail" "done" || return 1
     ;;
     *bz2)
         msg -n "Importing rootfs from tar.bz2 archive ... "
@@ -1011,7 +1045,7 @@ container_status()
 helper()
 {
 cat <<EOF
-Trixie Deploy ${VERSION}
+Trixie.apk ${VERSION}
 (c) 2012-2025 Anton Skshidlevsky, GPLv3
 
 USAGE:

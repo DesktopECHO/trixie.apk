@@ -5,31 +5,23 @@
 do_configure()
 {
     msg ":: Configuring ${COMPONENT} ... "
-    local linux_version="GNU/Linux"
-    if [ -f "${CHROOT_DIR}/etc/os-release" ]
-    then
-        linux_version=$(. "${CHROOT_DIR}/etc/os-release"; echo ${PRETTY_NAME})
-    elif [ -f "${CHROOT_DIR}/etc/gentoo-release" ]
-    then
-        linux_version=$(cat "${CHROOT_DIR}/etc/gentoo-release")
-    elif [ -f "${CHROOT_DIR}/etc/fedora-release" ]
-    then
-        linux_version=$(cat "${CHROOT_DIR}/etc/fedora-release")
-    elif [ -f "${CHROOT_DIR}/etc/redhat-release" ]
-    then
-        linux_version=$(cat "${CHROOT_DIR}/etc/redhat-release")
-    elif [ -f "${CHROOT_DIR}/etc/centos-release" ]
-    then
-        linux_version=$(cat "${CHROOT_DIR}/etc/centos-release")
-    elif [ -f "${CHROOT_DIR}/etc/arch-release" ]
-    then
-        linux_version="Arch Linux"
-    elif [ -f "${CHROOT_DIR}/etc/debian_version" ]
-    then
-        linux_version=$(printf "Debian GNU/Linux "; cat "${CHROOT_DIR}/etc/debian_version")
+    # Build the Debian string from the chroot
+    linux_version="Debian GNU/Linux $(cat "${CHROOT_DIR}/etc/debian_version")"
+
+    android_version="$(getprop ro.build.version.release 2>/dev/null)"
+    [ -z "$android_version" ] && android_version="$(getprop ro.build.version.release_or_codename 2>/dev/null)"
+    android_sdk="$(getprop ro.build.version.sdk 2>/dev/null)"
+    android_device="$(getprop ro.product.model 2>/dev/null)"
+
+    # Build the Android segment (only if anything was found)
+    android_info=""
+    if [ -n "$android_version$android_sdk$android_device" ]; then
+    android_info=" on Android"
+        [ -n "$android_version" ] && android_info="${android_info} ${android_version}"
+        [ -n "$android_device" ] && android_info="${android_info}, ${android_device}"
     fi
-    local motd="${linux_version} [running via Trixie]"
+    local motd="${linux_version} [Trixie.apk${android_info}]"
     rm -f "${CHROOT_DIR}/etc/motd"
-    echo ${motd} > "${CHROOT_DIR}/etc/motd"
-    return 0
+    printf '%s\n' "$motd" > "${CHROOT_DIR}/etc/motd"
 }
+return 0

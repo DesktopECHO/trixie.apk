@@ -1,0 +1,7 @@
+app/.DS_Store
+.DS_Store
+/app/release
+/build
+/.gradle
+/.idea
+app/ass

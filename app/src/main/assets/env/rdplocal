@@ -1,0 +1,146 @@
+#!/data/data/com.desktopecho.trixie/files/bin/sh
+
+echo "Starting activity monitoring script."
+am force-stop com.microsoft.rdc.androidx
+APPVER=$(dumpsys package com.microsoft.rdc.androidx | grep -i versionName | head -n1 | sed -E 's/.*versionName=([0-9]+).*/\1/')
+
+# Set a loop delay (in seconds)
+DELAY=0.5
+
+# Flags to ensure UI-specific key events are sent only once (0 = false/not sent, 1 = true/sent)
+REDIRECT_SENT=0
+TRUST_SENT=0
+
+# Variables for the 45-second time limit on UI checks
+CHECK_STARTED=0
+START_TIME=0
+TIME_LIMIT=45
+
+while true; do
+    # Execute the dumpsys command and filter the output
+    ACTIVITY_OUTPUT=$(dumpsys activity activities | grep "com.microsoft.rdc.androidx" | grep "trixie.rdp" )
+    # Check if the output is not empty (i.e., the target activity is running)
+    if [ -n "$ACTIVITY_OUTPUT" ] ; then
+
+        # Initialize timer on first match detection
+        if [ "$CHECK_STARTED" -eq 0 ]; then
+            START_TIME=$(date +%s)
+            CHECK_STARTED=1
+            echo "UI Check window started at $START_TIME (Limit: $TIME_LIMIT seconds)."
+        fi
+
+        # --- UI Check Block (Time-Limited and Single-Shot) ---
+        CURRENT_TIME=$(date +%s)
+        ELAPSED_TIME=$((CURRENT_TIME - START_TIME))
+
+        # Check if the UI actions are still needed
+        if [ "$REDIRECT_SENT" -eq 0 ] || [ "$TRUST_SENT" -eq 0 ]; then
+            # This block is limited to the first $TIME_LIMIT seconds.
+            if [ "$ELAPSED_TIME" -lt "$TIME_LIMIT" ]; then
+                # --- UI Check: Runs only ONCE per loop iteration, checking for BOTH strings ---
+                # UI_CHECK_RESULT will be either "redirect_check", "check_trust_always", or empty.
+                UI_CHECK_RESULT=$(uiautomator dump --compressed /dev/stdout 2>/dev/null | grep -Eo "(redirect_check|check_trust_always)" | tail -n1)
+                # --- (redirect_check) ---
+                if [ "$UI_CHECK_RESULT" = "redirect_check" ]; then
+                    if [ "$REDIRECT_SENT" -eq 0 ]; then
+                        echo "Action: Handling 'redirect_check'"
+                        WIN_GUARD=$(dumpsys window windows | grep windowsapp | tail -n1)
+                        if [ -n "$WIN_GUARD" ]; then
+                            input keyevent 19   # UP
+                            input keyevent 20   # DOWN
+                            input keyevent 20   # DOWN
+                            input keyevent 20   # DOWN
+                            input keyevent 20   # DOWN
+                            input keyevent 20   # DOWN
+                            input keyevent 19   # UP
+                            input keyevent 23   # OK
+                        else
+                            # Original redirect sequence
+                            input keyevent 19   # UP
+                            input keyevent 20   # DOWN
+                            input keyevent 20   # DOWN
+                            input keyevent 20   # DOWN
+                            input keyevent 20   # DOWN
+                            input keyevent 19   # UP
+                            input keyevent 23   # OK
+                            input keyevent 20   # DOWN
+                            input keyevent 22   # RIGHT
+                            input keyevent 23   # OK
+                        fi
+
+                        # Set the flag to prevent further execution for this case
+                        REDIRECT_SENT=1
+                        continue
+                    else
+                        : # Skipping 'redirect_check' action; already sent.
+                    fi
+                fi
+                # --- check_trust_always ---
+                if [ "$UI_CHECK_RESULT" = "check_trust_always" ]; then
+                    if [ "$TRUST_SENT" -eq 0 ]; then
+                        echo "Action: Handling 'check_trust_always'"
+                        WIN_GUARD=$(dumpsys window windows | grep windowsapp | tail -n1)
+                        if [ -n "$WIN_GUARD" ]; then
+                            input keyevent 19   # UP
+                            input keyevent 19   # UP
+                            input keyevent 23   # ENTER (tick)
+                            input keyevent 20   #
+                            input keyevent 20   #
+                            input keyevent 20   #
+                            input keyevent 22   #
+                            input keyevent 23   # ENTER (OK/Continue)
+                        else
+                            # Original trust sequence
+                            input keyevent 19   # UP
+                            input keyevent 19   # UP
+                            input keyevent 23   # ENTER (tick)
+                            input keyevent 20   #
+                            input keyevent 20   #
+                            input keyevent 20   #
+                            input keyevent 22   #
+                            input keyevent 23   # ENTER (OK/Continue)
+                        fi
+
+                        # Set the flag to prevent further execution for this case
+                        TRUST_SENT=1
+                    else
+                        : # Skipping 'check_trust_always' action; already sent.
+                    fi
+                fi
+
+                # Report status if nothing was found
+                if [ -z "$UI_CHECK_RESULT" ]; then
+                    : # No specific UI keyevent sent.
+                fi
+
+            else
+                : # UI Check window EXPIRED. Skipping UI checks.
+            fi
+        else
+            : # UI Checks skipped (actions already sent and timer logic disabled).
+        fi
+
+        # --- Prerequisite: Check XRDP Log Match (Repeated Action) ---
+        LOG_FILE="/data/local/trixie-chroot/var/log/xrdp.log"
+
+        # Check if the log file exists
+        if [ -f "$LOG_FILE" ]; then
+
+            # Run the log search (runs every time the activity is present)
+            LOG_MATCH=$(tail -n 50 "$LOG_FILE" 2>/dev/null | grep "connection accepted from" | grep "127.0.0.1")
+
+            if [ -n "$LOG_MATCH" ]; then
+                echo "PREREQUISITE MET: XRDP log match (Local login)"
+                sleep 1.5
+                input keyevent 23
+                sleep 5
+            fi
+        else
+            echo "Log file not found at $LOG_FILE. Skipping check."
+        fi
+
+    fi
+
+    # Wait for the specified delay before running the loop again
+    sleep $DELAY
+done

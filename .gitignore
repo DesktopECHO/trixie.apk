@@ -3,3 +3,4 @@ app/.DS_Store
 /app/release
 /build
 /.gradle
+/.idea

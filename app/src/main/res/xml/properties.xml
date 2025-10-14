@@ -2,32 +2,6 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory android:title="@string/bootstrap_preferences">
-        <ListPreference
-            android:defaultValue="@string/distrib"
-            android:dialogTitle="@string/dialog_title_distrib_preference"
-            android:entries="@array/distrib_entries"
-            android:entryValues="@array/distrib_values"
-            android:key="distrib"
-            android:summary="@string/distrib"
-            android:title="@string/title_distrib_preference" />
-
-        <ListPreference
-            android:defaultValue="@string/arch"
-            android:dialogTitle="@string/dialog_title_arch_preference"
-            android:entries="@array/debian_arch_values"
-            android:entryValues="@array/debian_arch_values"
-            android:key="arch"
-            android:summary="@string/arch"
-            android:title="@string/title_arch_preference" />
-
-        <ListPreference
-            android:defaultValue="@string/suite"
-            android:dialogTitle="@string/dialog_title_suite_preference"
-            android:entries="@array/debian_suite_values"
-            android:entryValues="@array/debian_suite_values"
-            android:key="suite"
-            android:summary="@string/suite"
-            android:title="@string/title_suite_preference" />
 
         <EditTextPreference
             android:defaultValue="@string/source_path"
@@ -77,14 +51,6 @@
             android:title="@string/title_user_name_preference" />
 
         <EditTextPreference
-            android:defaultValue="@string/user_password"
-            android:dialogTitle="@string/dialog_title_user_password_preference"
-            android:key="user_password"
-            android:maxLength="8"
-            android:summary="@string/user_password"
-            android:title="@string/title_user_password_preference" />
-
-        <EditTextPreference
             android:defaultValue="@string/privileged_users"
             android:dialogTitle="@string/dialog_title_privileged_users_preference"
             android:key="privileged_users"
@@ -120,32 +86,6 @@
             android:key="power_trigger"
             android:summary="@string/power_trigger"
             android:title="@string/title_power_trigger_preference" />
-
-    </PreferenceCategory>
-
-    <PreferenceCategory android:title="@string/init_preferences">
-
-        <CheckBoxPreference
-            android:defaultValue="@string/is_init"
-            android:key="is_init"
-            android:summary="@string/summary_is_init_preference"
-            android:title="@string/title_is_init_preference" />
-
-        <ListPreference
-            android:defaultValue="@string/init"
-            android:dependency="is_init"
-            android:dialogTitle="@string/dialog_title_init_preference"
-            android:entries="@array/init_values"
-            android:entryValues="@array/init_values"
-            android:key="init"
-            android:summary="@string/init"
-            android:title="@string/title_init_preference" />
-
-        <PreferenceScreen
-            android:dependency="is_init"
-            android:key="init_properties"
-            android:summary="@string/summary_init_properties_preference"
-            android:title="@string/title_init_properties_preference" />
 
     </PreferenceCategory>
 

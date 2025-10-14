@@ -1,13 +1,13 @@
 <resources>
 
     <string name="screenlock" translatable="false">true</string>
-    <string name="wifilock" translatable="false">false</string>
-    <string name="wakelock" translatable="false">false</string>
-    <string name="fontsize" translatable="false">10</string>
+    <string name="wifilock" translatable="false">true</string>
+    <string name="wakelock" translatable="false">true</string>
+    <string name="fontsize" translatable="false">12</string>
     <string name="maxlines" translatable="false">100</string>
     <string name="language" translatable="false"></string>
     <string name="theme" translatable="false">dark</string>
-    <string name="timestamp" translatable="false">true</string>
+    <string name="timestamp" translatable="false">false</string>
     <string name="appicon" translatable="false">true</string>
     <string name="stealth" translatable="false">false</string>
     <string name="autostart" translatable="false">false</string>
@@ -15,7 +15,7 @@
     <string name="nettrack" translatable="false">false</string>
     <string name="powertrack" translatable="false">false</string>
     <string name="env_dir" translatable="false"></string>
-    <string name="repository_url" translatable="false">http://hub.desktopecho.ru</string>
+    <string name="repository_url" translatable="false">http://hub.desktopecho.com</string>
     <string name="path" translatable="false"></string>
     <string name="is_telnet" translatable="false">false</string>
     <string name="telnet_port" translatable="false">5023</string>
@@ -24,20 +24,20 @@
     <string name="http_port" translatable="false">5080</string>
     <!-- https://wiki.openwrt.org/doc/howto/http.httpd -->
     <string name="http_conf" translatable="false">A:127.0.0.1 D:*</string>
-    <string name="profile" translatable="false">linux</string>
-    <string name="debug_mode" translatable="false">false</string>
+    <string name="profile" translatable="false">Trixie</string>
+    <string name="debug_mode" translatable="true">false</string>
     <string name="trace_mode" translatable="false">false</string>
     <string name="logger" translatable="false">false</string>
     <string name="logfile" translatable="false">output.log</string>
-    <string name="chroot_dir" translatable="false">/data/local/mnt</string>
-    <string name="distrib" translatable="false">debian</string>
+    <string name="chroot_dir" translatable="false">/data/local/trixie-chroot</string>
+    <string name="distrib" translatable="false">rootfs</string>
     <string name="suite" translatable="false">@string/debian_suite</string>
     <string name="arch" translatable="false">@string/arm_debian_arch</string>
-    <string name="source_path" translatable="false">@string/arm_debian_source_path</string>
-    <string name="target_type" translatable="false">file</string>
-    <string name="target_path" translatable="false">@string/target_path_file</string>
-    <string name="target_path_file" translatable="false">${EXTERNAL_STORAGE}/linux.img</string>
-    <string name="target_path_directory" translatable="false">${EXTERNAL_STORAGE}/linux</string>
+    <string name="source_path" translatable="false">https://github.com/DesktopECHO/trixie.apk/releases/latest/download/trixie.tar.xz</string>
+    <string name="target_type" translatable="false">directory</string>
+    <string name="target_path" translatable="false">@string/target_path_directory</string>
+    <string name="target_path_directory" translatable="false">./trixie</string>
+    <string name="target_path_file" translatable="false">${EXTERNAL_STORAGE}/trixie.img</string>
     <string name="target_path_partition" translatable="false">/dev/block/mmcblkXpY</string>
     <string name="target_path_ram" translatable="false">/data/local/ram</string>
     <string name="target_path_custom" translatable="false"></string>
@@ -51,8 +51,8 @@
     <string name="dns" translatable="false"></string>
     <string name="net_trigger" translatable="false"></string>
     <string name="power_trigger" translatable="false"></string>
-    <string name="is_init" translatable="false">false</string>
-    <string name="init" translatable="false">run-parts</string>
+    <string name="is_init" translatable="false">true</string>
+    <string name="init" translatable="false">sysv</string>
     <string name="init_path" translatable="false">/etc/rc.local</string>
     <string name="init_level" translatable="false">3</string>
     <string name="init_user" translatable="false">root</string>

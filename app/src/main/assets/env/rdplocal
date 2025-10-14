@@ -1,0 +1,24 @@
+#!/data/data/com.desktopecho.trixie/files/bin/sh
+# Loop: if log exists and last 50 lines show a local connection, send the key sequence
+
+LOG="/data/local/trixie-chroot/var/log/xrdp.log"
+
+while true; do
+  # If the log doesn't exist, skip this cycle and wait 3 seconds
+  if [ ! -f "$LOG" ]; then
+    sleep 3
+    continue
+  fi
+
+  if tail -n50 "$LOG" | grep -F "connection accepted from" | grep -Fq 127.0.0.1; then
+    input keyevent 19    # KEYCODE_DPAD_UP
+    input keyevent 66    # KEYCODE_ENTER
+    input keyevent 61    # KEYCODE_TAB
+    input keyevent 61    # KEYCODE_TAB
+    input keyevent 61    # KEYCODE_TAB
+    input keyevent 66    # KEYCODE_ENTER
+  fi
+
+  sleep 1.5
+done
+

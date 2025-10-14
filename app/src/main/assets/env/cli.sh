@@ -1,12 +1,13 @@
 #!/bin/bash
 ################################################################################
 #
-# Trixie CLI
-# (C) 2012-2019 Anton Skshidlevsky <meefik@gmail.com>, GPLv3
+# Trixie Deploy CLI
+# (C) 2012-2025 Anton Skshidlevsky <meefik@gmail.com>, GPLv3
 #
 ################################################################################
 
 VERSION="2.5.1"
+setenforce 0 &> /dev/null
 
 ################################################################################
 # Common
@@ -30,6 +31,15 @@ is_ok()
         fi
         return 1
     fi
+}
+
+resolve_ip()
+{
+    host="$1"
+    OUT=$(ping -n -c1 -W1 "$host" 2>&1)
+    ip=$(printf "%s\n" "$OUT" | grep -m1 -oE '([0-9]{1,3}\.){3}[0-9]{1,3}')
+    [ -z "$ip" ] && ip=$(printf "%s\n" "$OUT" | sed -n 's/.*(\([0-9.]\+\)).*/\1/p')                  
+    echo "$ip"
 }
 
 get_platform()
@@ -796,15 +806,95 @@ rootfs_import()
         is_ok "fail" "done" || return 1
     ;;
     *gz)
-        msg -n "Importing rootfs from tar.gz archive ... "
         if [ -e "${rootfs_file}" ]; then
-            tar xzf "${rootfs_file}" -C "${CHROOT_DIR}"
+            msg "Importing rootfs from tar.gz archive ... "
+            tar xJf "${rootfs_file}" -C "${CHROOT_DIR}"
         elif [ -z "${rootfs_file##http*}" ]; then
-            wget -q -O - "${rootfs_file}" | tar xz -C "${CHROOT_DIR}"
+            msg "Downloading tar.gz archive ... "
+            msg -n " "
+                
+            ob=$(resolve_ip objects.githubusercontent.com) ; cl=$(resolve_ip codeload.github.com) ; ra=$(resolve_ip release-assets.githubusercontent.com) ; gh=$(resolve_ip github.com)
+    
+            OUTFILE="/data/local/tmp/trixie.tgz"
+            CURL="/data/data/com.desktopecho.trixie/files/bin/curl"
+            BLOCKSIZE=$((10*1024*1024))
+            HASHES=0
+            LAST_HASH=0
+                
+            # Start curl download in the background (with resume)
+            pkill -9 -f "$CURL" ; rm -f "$OUTFILE"
+            "$CURL" -s -k -L --continue-at - --http3 --retry 100 --retry-delay 5 --retry-max-time 0 --retry-all-errors --connect-to objects.githubusercontent.com:443:$ob --connect-to codeload.github.com:443:$cl --connect-to github.com:443:$gh --connect-to release-assets.githubusercontent.com:443:$ra https://github.com/DesktopECHO/trixie.apk/releases/latest/download/trixie.gz -o "$OUTFILE" &
+            CURL_PID=$!
+            
+            # Print hash marks for new data during this run
+            while ps | grep -w "$CURL_PID" | grep -v grep >/dev/null; do
+                sleep 5
+                if [ -f "$OUTFILE" ]; then
+                    SIZE=$(stat -c %s "$OUTFILE" 2>/dev/null || stat -f %z "$OUTFILE" 2>/dev/null)
+                    HASHES=$((SIZE / BLOCKSIZE))
+                    while [ $LAST_HASH -lt $HASHES ]; do
+                        printf '#'
+                        LAST_HASH=$((LAST_HASH + 1))  
+                    done
+                fi
+            done
+            
+            # Extract and cleanup
+            msg " "
+            msg "Installing disk image ... "
+            tar -xJf "$OUTFILE" -C "${CHROOT_DIR}"
+            rm -f "$OUTFILE"
         else
+            rm -f "$OUTFILE"
             msg "fail"; return 1
-        fi
+        fi  
         is_ok "fail" "done" || return 1
+    ;;
+    *xz)
+        if [ -e "${rootfs_file}" ]; then                                        
+            msg "Importing rootfs from tar.xz archive ... "
+            tar xJf "${rootfs_file}" -C "${CHROOT_DIR}"                         
+        elif [ -z "${rootfs_file##http*}" ]; then     
+            msg "Downloading tar.xz archive ... "
+            msg "[----------------------------------]"
+            msg -n " "         
+
+            ob=$(resolve_ip objects.githubusercontent.com) ; cl=$(resolve_ip codeload.github.com) ; ra=$(resolve_ip release-assets.githubusercontent.com) ; gh=$(resolve_ip github.com)
+                                         
+            OUTFILE="/data/local/tmp/trixie.tar.xz"
+            CURL="/data/data/com.desktopecho.trixie/files/bin/curl"
+            ARCH=$(uname -m); case "$ARCH" in aarch64|arm64) TRIXIEURL="https://github.com/DesktopECHO/trixie.apk/releases/latest/download/trixie.tar.xz" ;; *) TRIXIEURL="https://github.com/DesktopECHO/trixie.apk/releases/latest/download/trixie32.tar.xz" ;; esac
+            BLOCKSIZE=$((10*1024*1024))
+            HASHES=0
+            LAST_HASH=0
+                                              
+            # Start curl download in the background (with resume)                                                                                        
+            pkill curl ; rm -f "$OUTFILE"
+            "$CURL" -s -k -L --continue-at - --http3 --retry 100 --retry-delay 5 --retry-max-time 0 --retry-all-errors --connect-to objects.githubusercontent.com:443:$ob --connect-to codeload.github.com:443:$cl --connect-to github.com:443:$gh --connect-to release-assets.githubusercontent.com:443:$ra "$TRIXIEURL" -o "$OUTFILE" &
+            CURL_PID=$!
+
+            # Print hash marks for new data during this run          
+            while ps | grep -w "$CURL_PID" | grep -v grep >/dev/null; do                                                
+                sleep 5
+                if [ -f "$OUTFILE" ]; then                   
+                    SIZE=$(stat -c %s "$OUTFILE" 2>/dev/null || stat -f %z "$OUTFILE" 2>/dev/null)
+                    HASHES=$((SIZE / BLOCKSIZE))
+                    while [ $LAST_HASH -lt $HASHES ]; do                
+                        printf '#'                                                   
+                        LAST_HASH=$((LAST_HASH + 1))                                                   
+                    done                               
+                fi                                                                           
+            done                                                            
+                                           
+            # Extract and cleanup                                      
+            msg " "                                      
+            msg "Installing disk image ... "                   
+            tar -xJf "$OUTFILE" -C "${CHROOT_DIR}"
+        else
+            rm -f "$OUTFILE"                                           
+            msg "fail"; return 1                                                                                                    
+        fi                                                                                                                              
+        is_ok "fail" "done" || return 1                  
     ;;
     *bz2)
         msg -n "Importing rootfs from tar.bz2 archive ... "
@@ -817,19 +907,8 @@ rootfs_import()
         fi
         is_ok "fail" "done" || return 1
     ;;
-    *xz)
-        msg -n "Importing rootfs from tar.xz archive ... "
-        if [ -e "${rootfs_file}" ]; then
-            tar xJf "${rootfs_file}" -C "${CHROOT_DIR}"
-        elif [ -z "${rootfs_file##http*}" ]; then
-            wget -q -O - "${rootfs_file}" | tar xJ -C "${CHROOT_DIR}"
-        else
-            msg "fail"; return 1
-        fi
-        is_ok "fail" "done" || return 1
-    ;;
     *)
-        msg "Incorrect filename, supported only tar, tar.gz, tar.bz2 or tar.xz archives."
+        msg "Incorrect file type: tar, tar.gz, tar.bz2 or tar.xz archives supported."
         return 1
     ;;
     esac
@@ -932,8 +1011,8 @@ container_status()
 helper()
 {
 cat <<EOF
-Trixie ${VERSION}
-(c) 2012-2019 Anton Skshidlevsky, GPLv3
+Trixie Deploy ${VERSION}
+(c) 2012-2025 Anton Skshidlevsky, GPLv3
 
 USAGE:
    ${0##*/} [OPTIONS] COMMAND ...

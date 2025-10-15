@@ -10,8 +10,8 @@ android {
         // API 28 must be frozen for binary execution
         //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 28
-        versionCode 259
-        versionName "2.6.0"
+        versionCode 103
+        versionName "1.0.3"
         vectorDrawables.useSupportLibrary true
     }
     buildTypes {

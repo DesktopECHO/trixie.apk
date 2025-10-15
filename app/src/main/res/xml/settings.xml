@@ -133,26 +133,6 @@
             android:key="telnet_localhost"
             android:summary="@string/summary_telnet_localhost_preference"
             android:title="@string/title_telnet_localhost_preference" />
-        <CheckBoxPreference
-            android:defaultValue="@string/is_http"
-            android:key="is_http"
-            android:summary="@string/summary_is_http_preference"
-            android:title="@string/title_is_http_preference" />
-        <EditTextPreference
-            android:defaultValue="@string/http_port"
-            android:dependency="is_http"
-            android:dialogTitle="@string/dialog_title_http_port_preference"
-            android:inputType="numberDecimal"
-            android:key="http_port"
-            android:summary="@string/http_port"
-            android:title="@string/title_http_port_preference" />
-        <EditTextPreference
-            android:defaultValue="@string/http_conf"
-            android:dependency="is_http"
-            android:dialogTitle="@string/dialog_title_http_conf_preference"
-            android:key="http_conf"
-            android:summary="@string/http_conf"
-            android:title="@string/title_http_conf_preference" />
     </PreferenceCategory>
     <PreferenceCategory android:title="@string/debug_preferences">
         <CheckBoxPreference

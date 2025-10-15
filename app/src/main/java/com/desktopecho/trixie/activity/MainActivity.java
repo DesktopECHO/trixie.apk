@@ -1,5 +1,7 @@
 package com.desktopecho.trixie.activity;
 
+import androidx.core.content.FileProvider;
+import java.io.File;
 import android.Manifest;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -233,22 +235,44 @@ public class MainActivity extends AppCompatActivity implements
                 Intent intent_profiles = new Intent(this, ProfilesActivity.class);
                 startActivity(intent_profiles);
                 break;
-            case R.id.nav_repository:
-                openRepository();
-                break;
             case R.id.nav_terminal:
-                String uri = "http://127.0.0.1:" + PrefStore.getHttpPort(this) +
-                        "/cgi-bin/terminal?size=" + PrefStore.getFontSize(this);
-                // Intent browserIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(uri));
-                // startActivity(browserIntent);
-                CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
-                if (PrefStore.getTheme(this) == R.style.LightTheme) {
-                    builder.setToolbarColor(Color.LTGRAY);
-                } else {
-                    builder.setToolbarColor(Color.DKGRAY);
+                // Create a File object for the .rdp file in your app's internal storage.
+                File rdpFile = new File(getFilesDir(), "trixie.rdp");
+
+                // Always check if the file actually exists before trying to share it.
+                if (!rdpFile.exists()) {
+                    Toast.makeText(this, "RDP file (trixie.rdp) not found!", Toast.LENGTH_LONG).show();
+                    break; // Exit if the file isn't there.
                 }
-                CustomTabsIntent customTabsIntent = builder.build();
-                customTabsIntent.launchUrl(this, Uri.parse(uri));
+
+                // Get the secure content URI from the FileProvider.
+                Uri rdpUri = FileProvider.getUriForFile(
+                        MainActivity.this,
+                        "com.desktopecho.trixie.provider",
+                        rdpFile
+                );
+
+                // Create the Intent to view the file.
+                Intent rdpIntent = new Intent(Intent.ACTION_VIEW);
+
+                // --- THIS IS THE NEW LINE ---
+                // Explicitly target the Microsoft RDP client to avoid an app chooser dialog.
+                rdpIntent.setClassName("com.microsoft.rdc.android", "com.microsoft.a3rdc.ui.activities.RdpFileUriLaunchActivity");
+
+                // Set the secure URI and the explicit MIME type.
+                rdpIntent.setDataAndType(rdpUri, "application/x-rdp");
+
+                // Grant read permission to the app that will handle this Intent (the RDP client).
+                rdpIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+
+                try {
+                    // Attempt to start the activity.
+                    startActivity(rdpIntent);
+                } catch (android.content.ActivityNotFoundException e) {
+                    // This will now catch the error if the RDP client is not installed.
+                    Toast.makeText(this, "Microsoft RDP client not found.", Toast.LENGTH_LONG).show();
+                    e.printStackTrace();
+                }
                 break;
             case R.id.nav_settings:
                 Intent intent_settings = new Intent(this, SettingsActivity.class);

@@ -841,7 +841,7 @@ rootfs_import()
             
             # Extract and cleanup
             msg " "
-            msg "Installing disk image ... "
+            msg "Installing Trixie rootfs ... "
             tar -xJf "$OUTFILE" -C "${CHROOT_DIR}"
             rm -f "$OUTFILE"
         else
@@ -888,7 +888,7 @@ rootfs_import()
                                            
             # Extract and cleanup                                      
             msg " "                                      
-            msg "Installing disk image ... "                   
+            msg "Installing Trixie rootfs ... "
             tar -xJf "$OUTFILE" -C "${CHROOT_DIR}"
         else
             rm -f "$OUTFILE"                                           

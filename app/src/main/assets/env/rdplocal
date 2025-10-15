@@ -1,24 +1,33 @@
 #!/data/data/com.desktopecho.trixie/files/bin/sh
-# Loop: if log exists and last 50 lines show a local connection, send the key sequence
 
 LOG="/data/local/trixie-chroot/var/log/xrdp.log"
+TMP_DUMP="/data/local/tmp/ui_check.xml"
+LAST_LOG_SIZE=0
 
 while true; do
-  # If the log doesn't exist, skip this cycle and wait 3 seconds
-  if [ ! -f "$LOG" ]; then
-    sleep 3
-    continue
-  fi
-
-  if tail -n50 "$LOG" | grep -F "connection accepted from" | grep -Fq 127.0.0.1; then
-    input keyevent 19    # KEYCODE_DPAD_UP
-    input keyevent 66    # KEYCODE_ENTER
-    input keyevent 61    # KEYCODE_TAB
-    input keyevent 61    # KEYCODE_TAB
-    input keyevent 61    # KEYCODE_TAB
-    input keyevent 66    # KEYCODE_ENTER
-  fi
-
-  sleep 1.5
+    # Get the current file size (faster than repeatedly using tail)
+    CURRENT_LOG_SIZE=$(stat -c %s "$LOG" 2>/dev/null || echo "0")
+    # Only run the expensive tail/grep process if the log file has GROWN
+    if [ "$CURRENT_LOG_SIZE" -gt "$LAST_LOG_SIZE" ]; then
+        # Check for local connection only if the log file has changed
+        if tail -n50 "$LOG" | grep -F "connection accepted from" | grep -Fq 127.0.0.1; then
+            uiautomator dump --compressed "$TMP_DUMP" &>/dev/null
+            grep -Fq 'com.microsoft.rdc.android:id/check_trust_always' "$TMP_DUMP"
+            DIALOG_FOUND=$? ; rm "$TMP_DUMP" &>/dev/null
+            if [ "$DIALOG_FOUND" -eq 0 ]; then
+                input keyevent 19
+                input keyevent 23    # KEYCODE_DPAD_CENTER
+                input keyevent 61    # KEYCODE_TAB
+                input keyevent 61    # KEYCODE_TAB
+                input keyevent 23
+                sleep 0.2
+                input keyevent 23
+            else
+                input keyevent 23
+            fi
+        fi
+        # Update the last size *only after* a potential match to ensure we don't miss new lines
+        LAST_LOG_SIZE="$CURRENT_LOG_SIZE"
+    fi
+    sleep 1
 done
-

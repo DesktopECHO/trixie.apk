@@ -36,7 +36,7 @@
     <string name="source_path" translatable="false">https://github.com/DesktopECHO/trixie.apk/releases/latest/download/trixie.tar.xz</string>
     <string name="target_type" translatable="false">directory</string>
     <string name="target_path" translatable="false">@string/target_path_directory</string>
-    <string name="target_path_directory" translatable="false">./trixie</string>
+    <string name="target_path_directory" translatable="false">trixie</string>
     <string name="target_path_file" translatable="false">${EXTERNAL_STORAGE}/trixie.img</string>
     <string name="target_path_partition" translatable="false">/dev/block/mmcblkXpY</string>
     <string name="target_path_ram" translatable="false">/data/local/ram</string>

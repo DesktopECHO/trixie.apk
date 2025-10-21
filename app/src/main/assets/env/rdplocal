@@ -1,50 +1,28 @@
 #!/data/data/com.desktopecho.trixie/files/bin/sh
 
-# This script continuously monitors the currently resumed Android activity using 'dumpsys'.
-# It is designed to run as a single instance only, controlled by a lock file.
-
-LOCKFILE="/data/local/tmp/rdplocal.lock"
-
-# --- Concurrency Control (Single Instance) ---
-# 1. Attempt to open the lock file for writing on file descriptor 9.
-if exec 9>"$LOCKFILE"; then
-    # 2. Attempt to acquire a non-blocking lock on file descriptor 9.
-    if flock -n 9; then
-        echo "Lock acquired. Starting activity monitoring script."
-    else
-        # Lock is held by another process. Exit immediately.
-        echo "Another instance of $(basename "$0") is running. Exiting."
-        exit 1
-    fi
-else
-    echo "ERROR: Could not open lock file $LOCKFILE for writing. Exiting."
-    exit 1
-fi
-# --- End Concurrency Control ---
-
-am force-stop com.microsoft.rdc.android
+echo "Starting activity monitoring script."
+am force-stop com.microsoft.rdc.androidx
+APPVER=$(dumpsys package com.microsoft.rdc.androidx | grep -i versionName | head -n1 | sed -E 's/.*versionName=([0-9]+).*/\1/')
 
 # Set a loop delay (in seconds)
 DELAY=0.5
 
 # Flags to ensure UI-specific key events are sent only once (0 = false/not sent, 1 = true/sent)
-REDIRECT_SENT=0 
-TRUST_SENT=0 
+REDIRECT_SENT=0
+TRUST_SENT=0
 
 # Variables for the 45-second time limit on secondary UI checks
 CHECK_STARTED=0
 START_TIME=0
 TIME_LIMIT=45
 
-# Variable to track the last modification time of the log file (0 means never checked)
-LAST_LOG_MODIFIED=0
-
 while true; do
     # 1. Execute the dumpsys command and filter the output
+    # Searching for the RDC package and a "Focus" indication on the activity
     ACTIVITY_OUTPUT=$(dumpsys activity activities | grep "com.microsoft.rdc.androidx" | grep "Focus" )
 
-    # 2. Check if the output is not empty AND contains both required strings.
-    if [[ ! -z "$ACTIVITY_OUTPUT" ]] ; then
+    # 2. Check if the output is not empty (i.e., the target activity is running)
+    if [ -n "$ACTIVITY_OUTPUT" ] ; then
 
         # Initialize timer on first match detection
         if [ "$CHECK_STARTED" -eq 0 ]; then
@@ -57,51 +35,61 @@ while true; do
         CURRENT_TIME=$(date +%s)
         ELAPSED_TIME=$((CURRENT_TIME - START_TIME))
 
-        # This block contains the single-shot key events and is gated by the flags and the timer.
+        # Check if the UI actions are still needed
         if [ "$REDIRECT_SENT" -eq 0 ] || [ "$TRUST_SENT" -eq 0 ]; then
-
+            # This block is limited to the first $TIME_LIMIT seconds.
             if [ "$ELAPSED_TIME" -lt "$TIME_LIMIT" ]; then
-                # --- Secondary UI Check (INDEPENDENT OF LOG) ---
-                UI_CHECK_RESULT=$(uiautomator dump --compressed /dev/stdout 2>/dev/null | grep -Eo "(check_trust_always|redirect_check)" | tail -n1)
-                # --- Conditional execution of key events (Case A and B) ---
-                if [ "$UI_CHECK_RESULT" == "redirect_check" ]; then
+                # --- Secondary UI Check: Runs only ONCE per loop iteration, checking for BOTH strings ---
+                # UI_CHECK_RESULT will be either "redirect_check", "check_trust_always", or empty.
+                UI_CHECK_RESULT=$(uiautomator dump --compressed /dev/stdout 2>/dev/null | grep -Eo "(redirect_check|check_trust_always)" | tail -n1)
+                # --- Conditional execution of key events (Case A: redirect_check) ---
+                if [ "$UI_CHECK_RESULT" = "redirect_check" ]; then
                     if [ "$REDIRECT_SENT" -eq 0 ]; then
                         # If the result is "redirect_check", send input keyevents
                         echo "Action: Sending keyevents for 'redirect_check' (First Time)."
-                        input keyevent 66   # ENTER
-                        input keyevent 20   # DOWN
-                        input keyevent 20   # DOWN
-                        input keyevent 20   # DOWN
-                        input keyevent 66   # ENTER
-                        input keyevent 20   # DOWN
-                        input keyevent 22   # RIGHT
-                        input keyevent 66   # ENTER
+                            input keyevent 19   # UP
+                            input keyevent 20   # DOWN
+                            input keyevent 20   # DOWN
+                            input keyevent 20   # DOWN
+                            input keyevent 20   # DOWN
+                            input keyevent 19   # UP
+                            input keyevent 23   # OK
+                            input keyevent 20   # DOWN
+                            input keyevent 22   # RIGHT
+                            input keyevent 23   # OK
 
-                        # Set the flag to prevent further execution for this case
-                        REDIRECT_SENT=1
-                    else
-                        echo "Skipping 'redirect_check' action; already sent."
+                            # Set the flag to prevent further execution for this case
+                            REDIRECT_SENT=1
+                            continue
+                        else
+                            : # Skipping 'redirect_check' action; already sent.
+                        fi
                     fi
 
-                elif [ "$UI_CHECK_RESULT" == "check_trust_always" ]; then
-                    if [ "$TRUST_SENT" -eq 0 ]; then
-                        # If the result is "check_trust_always", send input keyevents
-                        echo "Action: Sending keyevents for 'check_trust_always' (First Time)."
-                        input keyevent 19   # UP (focus "Always trust")
-                        input keyevent 23   # ENTER (tick)
-                        input keyevent 61   # TAB
-                        input keyevent 61   # TAB
-                        input keyevent 61   # TAB
-                        input keyevent 23   # ENTER (OK/Continue)
+                    # --- Conditional execution of key events (Case B: check_trust_always) ---
+                    if [ "$UI_CHECK_RESULT" = "check_trust_always" ]; then
+                        if [ "$TRUST_SENT" -eq 0 ]; then
+                            # If the result is "check_trust_always", send input keyevents
+                            echo "Action: Sending keyevents for 'check_trust_always' (First Time)."
+                            input keyevent 19   # UP
+                            input keyevent 19   # UP
+                            input keyevent 23   # ENTER (tick)
+                            input keyevent 20   #
+                            input keyevent 20   #
+                            input keyevent 20   #
+                            input keyevent 22   #
+                            input keyevent 23   # ENTER (OK/Continue)
 
                         # Set the flag to prevent further execution for this case
                         TRUST_SENT=1
                     else
-                        echo "Skipping 'check_trust_always' action; already sent."
+                        : # Skipping 'check_trust_always' action; already sent.
                     fi
+                fi
 
-                else
-                    : # No-op
+                # Report status if nothing was found
+                if [ -z "$UI_CHECK_RESULT" ]; then
+                    : # No specific UI keyevent sent.
                 fi
 
             else
@@ -109,42 +97,29 @@ while true; do
             fi
         else
             # Both single-shot UI actions have been completed
-            : No-op
+            : # Secondary UI Checks skipped (actions already sent and timer logic disabled).
         fi
 
+        # --- Prerequisite: Check XRDP Log Match (Repeated Action) ---
         LOG_FILE="/data/local/trixie-chroot/var/log/xrdp.log"
-        # Check if the log file exists and if its modification time has changed
-        if [ -f "$LOG_FILE" ]; then
-            # NOTE: stat -c %Y is standard GNU coreutils for modification time. 
-            # If the shell is very minimal, the syntax for 'stat' may need adjustment.
-            CURRENT_MODIFIED=$(stat -c %Y "$LOG_FILE" 2>/dev/null)
-            if [ "$CURRENT_MODIFIED" -ne "$LAST_LOG_MODIFIED" ]; then
-                echo "LOG MODIFIED: New entry detected. Checking content..."
-                # Update the timestamp
-                LAST_LOG_MODIFIED="$CURRENT_MODIFIED"
-                # Run the expensive log search (only runs if file changed)
-                LOG_MATCH=$(tail -n 50 "$LOG_FILE" 2>/dev/null | grep "connection accepted from" | grep "127.0.0.1")
-                if [[ ! -z "$LOG_MATCH" ]]; then
-                    echo "PREREQUISITE MET: XRDP log match found (connection 127.0.0.1)."
 
-                    # --- Execute Log Action (Runs repeatedly when condition is met) ---
-                    echo "Login on localhost detected"
-                    input keyevent 23
-                    sleep 10
-                else
-                    # Log Match NOT Found
-                    echo "XRDP Log match not found in new content."
-                fi
-            else
-                : # No-op if log is unchanged
+        # Check if the log file exists
+        if [ -f "$LOG_FILE" ]; then
+
+            # Run the log search (runs every time the activity is present)
+            LOG_MATCH=$(tail -n 50 "$LOG_FILE" 2>/dev/null | grep "connection accepted from" | grep "127.0.0.1")
+
+            if [ -n "$LOG_MATCH" ]; then
+                echo "PREREQUISITE MET: XRDP log match (Local login)"
+                sleep 1.5
+                input keyevent 23
+                sleep 5
             fi
         else
             echo "Log file not found at $LOG_FILE. Skipping check."
         fi
 
-        # 3. Echo the final timestamp after processing
     fi
-    # If no match or if ACTIVITY_OUTPUT was empty, nothing is printed.
 
     # Wait for the specified delay before running the loop again
     sleep $DELAY

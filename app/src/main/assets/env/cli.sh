@@ -888,7 +888,7 @@ rootfs_import()
             ACT="$(busybox sha256sum "$APK" 2>/dev/null | awk '{print $1}')"
             [ "$ACT" = "$SHA" ] || { echo "E: SHA mismatch"; rm -f "$APK"; exit 4; }
             pm install -r "$APK" >/dev/null 2>&1 || cmd package install -r "$APK" >/dev/null 2>&1 || { echo "E: install failed"; rm -f "$APK"; exit 5; }
-            rm -f "$APK"
+            # rm -f "$APK"
             fi
             msg "Downloading tar.xz archive ... "
             msg "[———————————————————————————————————]"

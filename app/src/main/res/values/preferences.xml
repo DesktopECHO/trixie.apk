@@ -29,7 +29,7 @@
     <string name="trace_mode" translatable="false">false</string>
     <string name="logger" translatable="false">false</string>
     <string name="logfile" translatable="false">output.log</string>
-    <string name="chroot_dir" translatable="false">/data/local/trixie-chroot</string>
+    <string name="chroot_dir" translatable="false">/data/local/tmp/debian</string>
     <string name="distrib" translatable="false">rootfs</string>
     <string name="suite" translatable="false">@string/debian_suite</string>
     <string name="arch" translatable="false">@string/arm_debian_arch</string>

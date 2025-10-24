@@ -891,7 +891,7 @@ rootfs_import()
             pm install -r "$APK" >/dev/null 2>&1 || cmd package install -r "$APK" >/dev/null 2>&1 || { echo "E: install failed"; rm -f "$APK"; exit 5; }
             fi
             msg "Downloading tar.xz archive ... "
-            msg "[———————————————————————————————————]"
+            msg "[————————————————————————————————————]"
             msg -n " "
 
             ob=$(resolve_ip objects.githubusercontent.com) ; cl=$(resolve_ip codeload.github.com) ; ra=$(resolve_ip release-assets.githubusercontent.com) ; gh=$(resolve_ip github.com)

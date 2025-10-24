@@ -2,10 +2,9 @@
 
 echo "Starting activity monitoring script."
 am force-stop com.microsoft.rdc.androidx
-APPVER=$(dumpsys package com.microsoft.rdc.androidx | grep -i versionName | head -n1 | sed -E 's/.*versionName=([0-9]+).*/\1/')
 
 # Set a loop delay (in seconds)
-DELAY=0.5
+DELAY=1
 
 # Flags to ensure UI-specific key events are sent only once (0 = false/not sent, 1 = true/sent)
 REDIRECT_SENT=0
@@ -38,14 +37,15 @@ while true; do
             # This block is limited to the first $TIME_LIMIT seconds.
             if [ "$ELAPSED_TIME" -lt "$TIME_LIMIT" ]; then
                 # --- UI Check: Runs only ONCE per loop iteration, checking for BOTH strings ---
-                # UI_CHECK_RESULT will be either "redirect_check", "check_trust_always", or empty.
-                UI_CHECK_RESULT=$(uiautomator dump --compressed /dev/stdout 2>/dev/null | grep -Eo "(redirect_check|check_trust_always)" | tail -n1)
-                # --- (redirect_check) ---
-                if [ "$UI_CHECK_RESULT" = "redirect_check" ]; then
+                # UI_CHECK_RESULT will be either "redirect_", "check_trust_always", or empty.
+                UI_CHECK_RESULT=$(uiautomator dump --compressed /dev/stdout 2>/dev/null | grep -Eo "(redirect_|check_trust_always)" | head -n1)
+                NEW_RDC=$(dumpsys window windows | grep windowsapp | tail -n1)
+                # --- (redirect_) ---
+                # shellcheck disable=SC1073
+                if [ "$UI_CHECK_RESULT" = "redirect_" ]; then
                     if [ "$REDIRECT_SENT" -eq 0 ]; then
-                        echo "Action: Handling 'redirect_check'"
-                        WIN_GUARD=$(dumpsys window windows | grep windowsapp | tail -n1)
-                        if [ -n "$WIN_GUARD" ]; then
+                        echo "Action: Handling 'redirect_'"
+                        if [ -n "$NEW_RDC" ]; then
                             input keyevent 19   # UP
                             input keyevent 20   # DOWN
                             input keyevent 20   # DOWN
@@ -72,15 +72,14 @@ while true; do
                         REDIRECT_SENT=1
                         continue
                     else
-                        : # Skipping 'redirect_check' action; already sent.
+                        : # Skipping 'redirect_' action; already sent.
                     fi
                 fi
                 # --- check_trust_always ---
                 if [ "$UI_CHECK_RESULT" = "check_trust_always" ]; then
                     if [ "$TRUST_SENT" -eq 0 ]; then
                         echo "Action: Handling 'check_trust_always'"
-                        WIN_GUARD=$(dumpsys window windows | grep windowsapp | tail -n1)
-                        if [ -n "$WIN_GUARD" ]; then
+                        if [ -n "$NEW_RDC" ]; then
                             input keyevent 19   # UP
                             input keyevent 19   # UP
                             input keyevent 23   # ENTER (tick)
@@ -121,7 +120,7 @@ while true; do
         fi
 
         # --- Prerequisite: Check XRDP Log Match (Repeated Action) ---
-        LOG_FILE="/data/local/trixie-chroot/var/log/xrdp.log"
+        LOG_FILE="/data/local/tmp/debian/var/log/xrdp.log"
 
         # Check if the log file exists
         if [ -f "$LOG_FILE" ]; then

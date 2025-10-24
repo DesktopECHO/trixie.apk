@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion '30.0.3'
+    compileSdkVersion 34
+    buildToolsVersion '34.0.0'
 
     defaultConfig {
         applicationId 'com.desktopecho.trixie'
@@ -10,8 +10,8 @@ android {
         // API 28 must be frozen for binary execution
         //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 28
-        versionCode 104
-        versionName "1.0.4"
+        versionCode 107
+        versionName "1.0.7"
         vectorDrawables.useSupportLibrary true
     }
     buildTypes {

@@ -5,3 +5,4 @@ app/.DS_Store
 /.gradle
 /.idea
 app/ass
+*.hprof

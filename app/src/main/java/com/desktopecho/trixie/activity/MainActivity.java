@@ -7,7 +7,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.net.wifi.WifiManager;
@@ -32,7 +31,6 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.view.GravityCompat;
@@ -461,17 +459,6 @@ public class MainActivity extends AppCompatActivity implements
         EnvUtils.execService(getBaseContext(), "status", null);
     }
 
-    /**
-     * Open repository action
-     */
-    private void openRepository() {
-        Intent intent = new Intent(this, RepositoryActivity.class);
-        startActivity(intent);
-    }
-
-    /**
-     * Request permission for write to storage
-     */
     private void updateEnvWithRequestPermissions() {
         boolean hasPermission = (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED);

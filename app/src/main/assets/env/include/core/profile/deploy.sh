@@ -11,16 +11,20 @@ do_configure()
     if [ -z "${USER_NAME%aid_*}" ]; then
         echo "Username \"${USER_NAME}\" is reserved."; return 1
     fi
-    # user profile
-    if [ "${USER_NAME}" != "root" ]; then
-        chroot_exec -u root groupadd ${USER_NAME} -g 1100
-        chroot_exec -u root useradd -g ${USER_NAME} -m -s /bin/bash -u 1100 ${USER_NAME}
-        chroot_exec -u root usermod -a -G ${USER_NAME} ${USER_NAME}
+    ANDROID_VERSION=$(getprop ro.build.version.release | tr -d '[:space:]')
+    if [ -z "${ANDROID_VERSION}" ]; then
+        ANDROID_VERSION="Android"
     fi
-    # set password for user
-    echo ${USER_NAME}:${USER_PASSWORD} | chroot_exec -u root chpasswd
-    # set permissions
-    chroot_exec -u root chown -R ${USER_NAME}:${USER_NAME} "$(user_home ${USER_NAME})"
+    GECOS_NAME=$(echo "${USER_NAME}" | awk '{print toupper(substr($0, 1, 1)) substr($0, 2)}')
+    GECOS_STRING="${GECOS_NAME} · Android ${ANDROID_VERSION}"
+
+    if [ "${USER_NAME}" != "root" ]; then
+        chroot_exec -u root groupadd "${USER_NAME}" -g 1100
+        chroot_exec -u root useradd -c "'${GECOS_STRING}'" -g "${USER_NAME}" -m -s /bin/bash -u 1100 "${USER_NAME}"
+        chroot_exec -u root usermod -a -G "${USER_NAME}" "${USER_NAME}"
+    fi
+    echo "${USER_NAME}:${USER_PASSWORD}" | chroot_exec -u root chpasswd
+    chroot_exec -u root chown -R "${USER_NAME}:${USER_NAME}" "$(user_home "${USER_NAME}")"
     return 0
 }
 

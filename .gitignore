@@ -6,3 +6,5 @@ app/.DS_Store
 /.idea
 app/ass
 *.hprof
+/app/.idea
+/app/.gradle

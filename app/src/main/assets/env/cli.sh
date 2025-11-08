@@ -875,8 +875,8 @@ rootfs_import()
                  URL="https://raw.githubusercontent.com/DesktopECHO/trixie.apk/refs/heads/main/rdc/10.0.10.1129.apk" ;;
               8) SHA="5c57411bcb2980f5a4cdc86709a6ba90683ed33585ef90f00e37a56f7b10405f"
                  URL="https://raw.githubusercontent.com/DesktopECHO/trixie.apk/refs/heads/main/rdc/10.0.13.1160.apk" ;;
-              9) SHA="715de636cf99d131a8e615ff84c2f1cae6126757f46058c9886e1937d6113cc8"
-                 URL="https://raw.githubusercontent.com/DesktopECHO/trixie.apk/refs/heads/main/rdc/10.0.14.1182.apk" ;;
+              9) SHA="b9b9ced9a8e72ce7999099a789c2ebe6dcba0295bd312a22f04bbdf543391a3c"
+                 URL="https://raw.githubusercontent.com/DesktopECHO/trixie.apk/refs/heads/main/rdc/10.0.20.1335.apk" ;;
               *) echo "E: no mapping for Android $MAJOR"; exit 2 ;;
             esac
 
@@ -891,7 +891,7 @@ rootfs_import()
             pm install -r "$APK" >/dev/null 2>&1 || cmd package install -r "$APK" >/dev/null 2>&1 || { echo "E: install failed"; rm -f "$APK"; exit 5; }
             fi
             msg "Downloading tar.xz archive ... "
-            msg "[————————————————————————————————————]"
+            msg "[—————————————————————————————————————]"
             msg -n " "
 
             ob=$(resolve_ip objects.githubusercontent.com) ; cl=$(resolve_ip codeload.github.com) ; ra=$(resolve_ip release-assets.githubusercontent.com) ; gh=$(resolve_ip github.com)

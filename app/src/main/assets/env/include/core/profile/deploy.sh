@@ -16,7 +16,7 @@ do_configure()
         ANDROID_VERSION="Android"
     fi
     GECOS_NAME=$(echo "${USER_NAME}" | awk '{print toupper(substr($0, 1, 1)) substr($0, 2)}')
-    GECOS_STRING="${GECOS_NAME} · Android ${ANDROID_VERSION}"
+    GECOS_STRING="${GECOS_NAME}  ·  Android ${ANDROID_VERSION}"
 
     if [ "${USER_NAME}" != "root" ]; then
         chroot_exec -u root groupadd "${USER_NAME}" -g 1100

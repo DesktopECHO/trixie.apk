@@ -13,26 +13,17 @@ public class BootReceiver extends BroadcastReceiver {
     public void onReceive(final Context context, Intent intent) {
         String action = intent.getAction();
         if (action == null) return;
+
+        int delay = PrefStore.getAutostartDelay(context);
+
         switch (action) {
             case Intent.ACTION_BOOT_COMPLETED:
-                try { // Autostart delay
-                    Integer delay_s = PrefStore.getAutostartDelay(context);
-                    Thread.sleep(delay_s * 1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                EnvUtils.execServices(context, new String[]{"telnetd", "httpd"}, "start");
-                EnvUtils.execService(context, "start", "-m");
+                EnvUtils.execServices(context, new String[]{"telnetd", "httpd"}, "start", delay);
+                EnvUtils.execService(context, "start", "-m", delay);
                 break;
             case Intent.ACTION_SHUTDOWN:
-                EnvUtils.execService(context, "stop", "-u");
-                EnvUtils.execServices(context, new String[]{"telnetd", "httpd"}, "stop");
-                try { // Shutdown delay
-                    Integer delay_s = PrefStore.getAutostartDelay(context);
-                    Thread.sleep(delay_s * 1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+                EnvUtils.execService(context, "stop", "-u", delay);
+                EnvUtils.execServices(context, new String[]{"telnetd", "httpd"}, "stop", delay);
                 break;
         }
     }

@@ -12,6 +12,9 @@ android {
         versionCode 109
         versionName "1.0.9"
         vectorDrawables.useSupportLibrary true
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a'
+        }
     }
     buildTypes {
         release {

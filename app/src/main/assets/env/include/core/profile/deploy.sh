@@ -11,12 +11,15 @@ do_configure()
     if [ -z "${USER_NAME%aid_*}" ]; then
         echo "Username \"${USER_NAME}\" is reserved."; return 1
     fi
+
     ANDROID_VERSION=$(getprop ro.build.version.release | tr -d '[:space:]')
-    if [ -z "${ANDROID_VERSION}" ]; then
-        ANDROID_VERSION="Android"
+
+    if [ "${USER_NAME}" = "android" ]; then
+        GECOS_STRING="Android ${ANDROID_VERSION}"
+    else
+        GECOS_NAME=$(echo "${USER_NAME}" | awk '{print toupper(substr($0, 1, 1)) substr($0, 2)}')
+        GECOS_STRING="${GECOS_NAME} · Android ${ANDROID_VERSION}"
     fi
-    GECOS_NAME=$(echo "${USER_NAME}" | awk '{print toupper(substr($0, 1, 1)) substr($0, 2)}')
-    GECOS_STRING="${GECOS_NAME}  ·  Android ${ANDROID_VERSION}"
 
     if [ "${USER_NAME}" != "root" ]; then
         chroot_exec -u root groupadd "${USER_NAME}" -g 1100

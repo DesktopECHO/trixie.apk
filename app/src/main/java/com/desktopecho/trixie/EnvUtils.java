@@ -388,9 +388,22 @@ public class EnvUtils {
      * @param args arguments
      */
     public static void execService(Context c, String cmd, String args) {
+        execService(c, cmd, args, 0);
+    }
+
+    /**
+     * Execute command via service
+     *
+     * @param c     context
+     * @param cmd   command
+     * @param args  arguments
+     * @param delay autostart delay
+     */
+    public static void execService(Context c, String cmd, String args, int delay) {
         Intent service = new Intent(c, ExecService.class);
         service.putExtra("cmd", cmd);
         service.putExtra("args", args);
+        service.putExtra("delay", delay);
         ExecService.enqueueWork(c, service);
     }
 
@@ -402,8 +415,20 @@ public class EnvUtils {
      * @param args     command and arguments
      */
     public static void execServices(Context c, String[] commands, String args) {
+        execServices(c, commands, args, 0);
+    }
+
+    /**
+     * Execute commands via service
+     *
+     * @param c        context
+     * @param commands commands
+     * @param args     command and arguments
+     * @param delay    autostart delay
+     */
+    public static void execServices(Context c, String[] commands, String args, int delay) {
         for (String cmd : commands) {
-            execService(c, cmd, args);
+            execService(c, cmd, args, delay);
         }
     }
 

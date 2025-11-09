@@ -18,13 +18,31 @@ public class ExecService extends JobIntentService {
     protected void onHandleWork(@NonNull Intent intent) {
         final String cmd = intent.getStringExtra("cmd");
         final String args = intent.getStringExtra("args");
+        final int delay = intent.getIntExtra("delay", 0);
+
         Thread thread = new Thread(() -> {
+            try {
+                if (delay > 0) {
+                    Thread.sleep(delay * 1000L);
+                }
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                return;
+            }
+
             switch (cmd) {
                 case "telnetd":
                     EnvUtils.telnetd(getBaseContext(), args);
                     break;
                 case "httpd":
                     EnvUtils.httpd(getBaseContext(), args);
+                    break;
+                case "deploy":
+                    PrefStore.showNotification(getBaseContext(), null);
+                    if (EnvUtils.cli(getApplicationContext(), cmd, args)) {
+                        // After successful deployment, start the debian instance
+                        EnvUtils.cli(getApplicationContext(), "start", "-m");
+                    }
                     break;
                 default:
                     PrefStore.showNotification(getBaseContext(), null);

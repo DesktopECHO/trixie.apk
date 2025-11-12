@@ -33,18 +33,6 @@ public class PropertiesFragment extends PreferenceFragmentCompat implements
                 case 2:
                     setPreferencesFromResource(R.xml.properties_vnc, rootKey);
                     break;
-                case 3:
-                    setPreferencesFromResource(R.xml.properties_x11, rootKey);
-                    break;
-                case 4:
-                    setPreferencesFromResource(R.xml.properties_fb, rootKey);
-                    break;
-                case 5:
-                    setPreferencesFromResource(R.xml.properties_run_parts, rootKey);
-                    break;
-                case 6:
-                    setPreferencesFromResource(R.xml.properties_sysv, rootKey);
-                    break;
                 case 7:
                     setPreferencesFromResource(R.xml.properties_pulse, rootKey);
                     break;
@@ -84,28 +72,6 @@ public class PropertiesFragment extends PreferenceFragmentCompat implements
                 switch (graphics.getValue()) {
                     case "vnc":
                         intent.putExtra("pref", 2);
-                        break;
-                    case "x11":
-                        intent.putExtra("pref", 3);
-                        break;
-                    case "fb":
-                        intent.putExtra("pref", 4);
-                        break;
-                }
-
-                startActivity(intent);
-                break;
-            }
-            case "init_properties": {
-                Intent intent = new Intent(getContext(), PropertiesActivity.class);
-
-                ListPreference init = findPreference("init");
-                switch (init.getValue()) {
-                    case "run-parts":
-                        intent.putExtra("pref", 5);
-                        break;
-                    case "sysv":
-                        intent.putExtra("pref", 6);
                         break;
                 }
 
@@ -177,94 +143,6 @@ public class PropertiesFragment extends PreferenceFragmentCompat implements
             ListPreference listPref = (ListPreference) pref;
             pref.setSummary(listPref.getEntry());
 
-            if (listPref.getKey().equals("distrib")) {
-                ListPreference suite = findPreference("suite");
-                ListPreference architecture = findPreference("arch");
-                EditTextPreference sourcepath = findPreference("source_path");
-
-                String distributionStr = listPref.getValue();
-
-                // suite
-                int suiteValuesId = PrefStore.getResourceId(getContext(),
-                        distributionStr + "_suite_values", "array");
-                if (suiteValuesId > 0) {
-                    suite.setEntries(suiteValuesId);
-                    suite.setEntryValues(suiteValuesId);
-                }
-                if (init) {
-                    int suiteId = PrefStore.getResourceId(getContext(), distributionStr
-                            + "_suite", "string");
-                    if (suiteId > 0) {
-                        String suiteStr = getString(suiteId);
-                        if (suiteStr.length() > 0)
-                            suite.setValue(suiteStr);
-                    }
-                }
-                suite.setSummary(suite.getEntry());
-                suite.setEnabled(true);
-
-                // architecture
-                int architectureValuesId = PrefStore.getResourceId(getContext(),
-                        distributionStr + "_arch_values", "array");
-                if (suiteValuesId > 0) {
-                    architecture.setEntries(architectureValuesId);
-                    architecture.setEntryValues(architectureValuesId);
-                }
-                if (init || architecture.getValue().length() == 0) {
-                    int architectureId = PrefStore.getResourceId(getContext(),
-                            PrefStore.getArch() + "_" + distributionStr
-                                    + "_arch", "string");
-                    if (architectureId > 0) {
-                        String architectureStr = getString(architectureId);
-                        if (architectureStr.length() > 0)
-                            architecture.setValue(architectureStr);
-                    }
-                }
-                architecture.setSummary(architecture.getEntry());
-                architecture.setEnabled(true);
-
-                // source path
-                if (init || sourcepath.getText().length() == 0) {
-                    int sourcepathId = PrefStore
-                            .getResourceId(getContext(), PrefStore.getArch() + "_"
-                                    + distributionStr + "_source_path", "string");
-                    if (sourcepathId > 0) {
-                        sourcepath.setText(getString(sourcepathId));
-                    }
-                }
-                sourcepath.setSummary(sourcepath.getText());
-                sourcepath.setEnabled(true);
-
-                // RootFS
-                if (distributionStr.equals("rootfs")) {
-                    // suite
-                    suite.setEnabled(false);
-                    // architecture
-                    architecture.setEnabled(false);
-                    // source path
-                    if (init) {
-                        String archiveFile = getString(R.string.rootfs_archive);
-                        sourcepath.setText(archiveFile);
-                    }
-                    sourcepath.setSummary(sourcepath.getText());
-                    sourcepath.setEnabled(true);
-                }
-            }
-            if (listPref.getKey().equals("arch") && init) {
-                ListPreference distribution = findPreference("distrib");
-                EditTextPreference sourcepath = findPreference("source_path");
-
-                String architectureStr = PrefStore.getArch(listPref.getValue());
-                String distributionStr = distribution.getValue();
-
-                int sourcePathId = PrefStore.getResourceId(getContext(), architectureStr
-                        + "_" + distributionStr + "_source_path", "string");
-                if (sourcePathId > 0) {
-                    sourcepath.setText(getString(sourcePathId));
-                }
-
-                sourcepath.setSummary(sourcepath.getText());
-            }
             if (listPref.getKey().equals("target_type")) {
                 EditTextPreference targetpath = findPreference("target_path");
                 EditTextPreference disksize = findPreference("disk_size");

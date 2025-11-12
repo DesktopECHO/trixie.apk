@@ -16,7 +16,7 @@ class PropertiesStore extends ParamUtils {
             "privileged_users", "locale", "dns", "net_trigger", "power_trigger", "init", "init_path", "init_level",
             "init_user", "init_async", "ssh_port", "ssh_args", "pulse_host", "pulse_port", "graphics",
             "vnc_display", "vnc_depth", "vnc_dpi", "vnc_width", "vnc_height", "vnc_args",
-            "x11_display", "x11_host", "x11_sdl", "x11_sdl_delay", "fb_display", "fb_dev",
+            "fb_display", "fb_dev",
             "fb_input", "fb_args", "fb_refresh", "fb_freeze", "desktop", "mounts", "include"};
 
     PropertiesStore() {

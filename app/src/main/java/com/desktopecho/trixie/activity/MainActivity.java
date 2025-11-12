@@ -154,7 +154,6 @@ public class MainActivity extends AppCompatActivity implements
             EnvUtils.execServices(getBaseContext(), new String[]{"telnetd", "httpd"}, "start");
         } else {
             // Update ENV
-            PrefStore.setRepositoryUrl(this, getString(R.string.repository_url));
             updateEnvWithRequestPermissions();
         }
     }
@@ -268,7 +267,6 @@ public class MainActivity extends AppCompatActivity implements
                 }
                 break;
 
-            // --- START OF CODE TO ADD BACK IN ---
             case R.id.nav_settings:
                 Intent intent_settings = new Intent(this, SettingsActivity.class);
                 startActivity(intent_settings);
@@ -286,7 +284,6 @@ public class MainActivity extends AppCompatActivity implements
                 PrefStore.hideNotification(getBaseContext());
                 finish();
                 break;
-            // --- END OF CODE TO ADD BACK IN ---
         }
 
         drawer.closeDrawer(GravityCompat.START);
@@ -354,13 +351,7 @@ public class MainActivity extends AppCompatActivity implements
                         (dialog, id) -> {
                             // actions
                             Handler h = new Handler();
-                            if (PrefStore.isXserver(getApplicationContext())
-                                    && PrefStore.isXsdl(getApplicationContext())) {
-                                PackageManager pm = getPackageManager();
-                                Intent intent = pm.getLaunchIntentForPackage("x.org.server");
-                                if (intent != null) startActivity(intent);
-                                h.postDelayed(() -> EnvUtils.execService(getBaseContext(), "start", "-m"), PrefStore.getXsdlDelay(getApplicationContext()));
-                            } else if (PrefStore.isFramebuffer(getApplicationContext())) {
+                            if (PrefStore.isFramebuffer(getApplicationContext())) {
                                 EnvUtils.execService(getBaseContext(), "start", "-m");
                                 h.postDelayed(() -> {
                                     Intent intent = new Intent(getApplicationContext(),

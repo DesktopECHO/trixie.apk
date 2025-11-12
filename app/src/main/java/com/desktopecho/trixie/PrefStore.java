@@ -508,17 +508,6 @@ public class PrefStore {
     }
 
     /**
-     * X server is enabled
-     *
-     * @param c context
-     * @return true if enabled
-     */
-    public static boolean isXserver(Context c) {
-        return PROPERTIES.get(c, "is_gui").equals("true") &&
-                PROPERTIES.get(c, "graphics").equals("x11");
-    }
-
-    /**
      * Framebuffer is enabled
      *
      * @param c context
@@ -527,35 +516,6 @@ public class PrefStore {
     public static boolean isFramebuffer(Context c) {
         return PROPERTIES.get(c, "is_gui").equals("true") &&
                 PROPERTIES.get(c, "graphics").equals("fb");
-    }
-
-    /**
-     * XServer XSDL is enabled
-     *
-     * @param c context
-     * @return true if enabled
-     */
-    public static boolean isXsdl(Context c) {
-        return PROPERTIES.get(c, "x11_sdl").equals("true");
-    }
-
-    /**
-     * Get XServer XSDL opening delay
-     *
-     * @param c context
-     * @return delay in ms
-     */
-    public static int getXsdlDelay(Context c) {
-        int deplayInt;
-        String delay = PROPERTIES.get(c, "x11_sdl_delay");
-        try {
-            deplayInt = Integer.parseInt(delay);
-        } catch (Exception e) {
-            delay = c.getString(R.string.x11_sdl_delay);
-            deplayInt = Integer.parseInt(delay);
-            PROPERTIES.set(c, "x11_sdl_delay", delay);
-        }
-        return deplayInt * 1000;
     }
 
     /**
@@ -653,7 +613,7 @@ public class PrefStore {
      * Get hardware architecture
      *
      * @param arch unformated architecture
-     * @return arm, arm_64, x86, x86_64
+     * @return arm, arm_64
      */
     public static String getArch(String arch) {
         String march = "unknown";
@@ -661,14 +621,8 @@ public class PrefStore {
             char a = arch.toLowerCase().charAt(0);
             switch (a) {
                 case 'a':
-                    if (arch.equals("amd64")) march = "x86_64";
-                    else if (arch.contains("64")) march = "arm_64";
+                    if (arch.contains("64")) march = "arm_64";
                     else march = "arm";
-                    break;
-                case 'i':
-                case 'x':
-                    if (arch.contains("64")) march = "x86_64";
-                    else march = "x86";
                     break;
             }
         }
@@ -678,7 +632,7 @@ public class PrefStore {
     /**
      * Get current hardware architecture
      *
-     * @return arm, arm_64, x86, x86_64
+     * @return arm, arm_64
      */
     public static String getArch() {
         return getArch(System.getProperty("os.arch"));

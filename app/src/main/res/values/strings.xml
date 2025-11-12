@@ -312,21 +312,6 @@
     <string name="title_vnc_args_preference">VNC options</string>
     <string name="dialog_title_vnc_args_preference">VNC: vncserver options</string>
 
-    <!-- X11 -->
-    <string name="x11_preferences">X11</string>
-    <!-- X11_DISPLAY -->
-    <string name="title_x11_display_preference">Display</string>
-    <string name="dialog_title_x11_display_preference">X11: display number</string>
-    <!-- X11_HOST -->
-    <string name="title_x11_host_preference">X server address</string>
-    <string name="dialog_title_x11_host_preference">X11: IP or host name</string>
-    <!-- X11_SDL -->
-    <string name="title_x11_sdl_preference">XServer XSDL</string>
-    <string name="summary_x11_sdl_preference">Automatically open XServer XSDL</string>
-    <!-- X11_SDL_DELAY -->
-    <string name="title_x11_sdl_delay_preference">Start delay</string>
-    <string name="dialog_title_x11_sdl_delay_preference">X11: delay in seconds</string>
-
     <!-- Framebuffer -->
     <string name="fb_preferences">Framebuffer</string>
     <!-- FB_DISPLAY -->
@@ -344,12 +329,6 @@
     <!-- FB_ARGS -->
     <string name="title_fb_args_preference">X options</string>
     <string name="dialog_title_fb_args_preference">FB: X options</string>
-    <!-- FB_FREEZE -->
-    <string name="title_fb_freeze_preference">Freeze Android UI</string>
-    <string name="dialog_title_fb_freeze_preference">Freeze Android UI</string>
-    <!-- FB_REFRESH -->
-    <string name="title_fb_refresh_preference">Force refresh</string>
-    <string name="summary_fb_refresh_preference">Force refresh framebuffer</string>
 
     <!-- HELP -->
     <string name="help_text">

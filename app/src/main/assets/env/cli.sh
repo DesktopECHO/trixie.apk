@@ -891,13 +891,13 @@ rootfs_import()
             pm install -r "$APK" >/dev/null 2>&1 || cmd package install -r "$APK" >/dev/null 2>&1 || { echo "E: install failed"; rm -f "$APK"; exit 5; }
             fi
             msg "Downloading tar.xz archive ... "
-            msg "[————————————————————————————————————]"
+            msg "[——————————————————————————————————————]"
             msg -n " "
 
             ob=$(resolve_ip objects.githubusercontent.com) ; cl=$(resolve_ip codeload.github.com) ; ra=$(resolve_ip release-assets.githubusercontent.com) ; gh=$(resolve_ip github.com)
 
             OUTFILE="/data/local/tmp/trixie.tar.xz"
-            ARCH=$(uname -m); case "$ARCH" in aarch64|arm64) TRIXIEURL="https://github.com/DesktopECHO/trixie.apk/releases/latest/download/trixie.tar.xz" ;; *) TRIXIEURL="https://github.com/DesktopECHO/trixie.apk/releases/latest/download/trixie32.tar.xz" && printf "#" ;; esac
+            ARCH=$(uname -m); case "$ARCH" in aarch64|arm64) TRIXIEURL="https://github.com/DesktopECHO/trixie.apk/releases/latest/download/trixie.tar.xz" ;; *) TRIXIEURL="https://github.com/DesktopECHO/trixie.apk/releases/latest/download/trixie32.tar.xz" && printf "##" ;; esac
             BLOCKSIZE=$((10*1024*1024))
             HASHES=0
             LAST_HASH=0

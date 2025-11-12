@@ -258,12 +258,10 @@
     </string-array>
     <string-array name="graphics_values" translatable="false">
         <item>vnc</item>
-        <item>x11</item>
         <item>fb</item>
     </string-array>
     <string-array name="graphics_entries" translatable="false">
         <item>VNC</item>
-        <item>X11</item>
         <item>Framebuffer</item>
     </string-array>
     <string-array name="fb_freeze_values" translatable="false">

@@ -1,16 +1,23 @@
 # Trixie.apk
 
-[![PH](https://user-images.githubusercontent.com/33142753/133272103-28c6eba3-d1f7-4e29-9c5b-7d96d9f94e9e.jpg)](https://www.youtube.com/watch?v=sdDkKvaRvOs)
+### Features
 
+ - Debian 13 (Trixie) can be used as a server or desktop OS
+ - Desktop environment can be accessed on-device or remotely
+ - Reliable autostart when the deivce is powered-up or rebooted
+ - Audio and Microphone (in/out) both work
+ - Preconfigured Pi-hole DNS ad-blocker with Unbound DoT forwarder
+ - AirPlay 2 receiver makes any wired or bluetooth speaker visible in HomeKit
+    
 ### Requirements:
 
-- Android 5 (Lolipop) or newer device that has been rooted
+- Android 5 (Lollipop) or newer device that has been rooted
 
-## Install 
-### Download the latest [Pi Deploy APK](https://github.com/DesktopECHO/Pi-hole-for-Android/releases/latest/download/pideploy.apk) and open the app.
-
-- Tap **Allow** if asked for permission to access files or run as root.  
-
+### Install
+- Install [trixie.apk](https://github.com/DesktopECHO/trixie.apk/releases/latest/download/trixie.apk) and open the app.
+  
+- Tap **Allow** if asked for permission to access files or run as root.
+  
 - Tap **More Options** (**Three dots** at the top right of screen)
     ![image](https://github.com/DesktopECHO/Pi-hole-for-Android/assets/33142753/b8cbe9e3-f47a-4e3b-a155-b6b0aa3a5161")
 

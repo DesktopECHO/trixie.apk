@@ -166,27 +166,13 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         PrefStore.setLocale(this);
-        int orientation = getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            getMenuInflater().inflate(R.menu.activity_main_landscape, menu);
-        } else {
-            getMenuInflater().inflate(R.menu.activity_main_portrait, menu);
-        }
+        getMenuInflater().inflate(R.menu.activity_main_portrait, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_start:
-                containerStart(null);
-                break;
-            case R.id.menu_stop:
-                containerStop(null);
-                break;
-            case R.id.menu_properties:
-                containerProperties(null);
-                break;
             case R.id.menu_install:
                 containerDeploy();
                 break;
@@ -231,6 +217,11 @@ public class MainActivity extends AppCompatActivity implements
             case R.id.nav_profiles:
                 Intent intent_profiles = new Intent(this, ProfilesActivity.class);
                 startActivity(intent_profiles);
+                break;
+
+            case R.id.nav_properties:
+                Intent intent_properties = new Intent(this, PropertiesActivity.class);
+                startActivity(intent_properties);
                 break;
 
             case R.id.nav_terminal:
@@ -296,7 +287,7 @@ public class MainActivity extends AppCompatActivity implements
 
         String profileName = PrefStore.getProfileName(this);
         String ipAddress = PrefStore.getLocalIpAddress();
-        setTitle(profileName + "  [ " + ipAddress + " ]");
+        setTitle(profileName + "  •  " + ipAddress);
 
         // show icon
         PrefStore.showNotification(getBaseContext(), getIntent());
@@ -382,17 +373,6 @@ public class MainActivity extends AppCompatActivity implements
                 .setNegativeButton(android.R.string.no,
                         (dialog, id) -> dialog.cancel())
                 .show();
-    }
-
-    /**
-     * Container properties action
-     *
-     * @param view
-     */
-    public void containerProperties(View view) {
-        Intent intent = new Intent(this, PropertiesActivity.class);
-        intent.putExtra("restore", true);
-        startActivity(intent);
     }
 
     /**

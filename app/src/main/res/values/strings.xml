@@ -156,7 +156,7 @@
 
     <!-- INSTALL -->
     <string name="title_install_dialog">Install</string>
-    <string name="message_install_dialog">Start Debian installation?</string>
+    <string name="message_install_dialog">Start Debian 13 (Trixie) install?\n\nThis will overwrite any previously created deployment.</string>
     <!-- CONFIGURE -->
     <string name="title_configure_dialog">Configure</string>
     <string name="message_configure_dialog">Start configuration of the container?</string>
@@ -332,21 +332,19 @@
 
     <!-- HELP -->
     <string name="help_text">
-\nThis application installs Debian 13\n(Trixie) in a chroot container.\n\n\n
-To deploy a new Linux instance:\n\n
+\n This application installs Debian 13\n (Trixie) in a chroot container.\n\n\n
+" To deploy a new instance:"\n\n
 "  1. Get superuser privileges (root)."\n\n
 "  2. Verify your Internet connectivity."\n\n
-"  3. Start the installation:"\n
-"     Tap the options menu at the top right"\n
-"     (three dots ⋮ ) and \"Install\"."\n\n
+"  3. Begin the installation:"\n
+"     Tap the options menu, top right"\n
+"     (three vertical dots ⋮ ) and \"Install\"."\n\n
 "  4. Wait a few minutes for the"\n
 "     installation to complete."\n\n
-"  5. Tap the \"START\" button"\n
-"     to run the container."\n\n
-" The desktop environment will appear"\n
-" shortly after the container is started."\n\n\n
-" To start/reconnect a desktop session:"\n\n
-"  - Tap the main menu at the top left"\n
+" The desktop environment will start up"\n
+" automatically after install is finished."\n\n\n
+" To open or reconnect a desktop session:"\n\n
+"  - Tap the navigation drawer, top left"\n
 "    (Three dashes ≡ ) and \"Desktop\""
     </string>
     <!-- ABOUT -->

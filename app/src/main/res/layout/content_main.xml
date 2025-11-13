@@ -38,18 +38,25 @@
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         android:baselineAligned="false"
+        android:layout_marginBottom="10dp"
         android:weightSum="1"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
 
+        <View
+            android:layout_width="12dp"
+            android:layout_height="match_parent"
+            android:background="?android:attr/colorBackground" />
+
         <Button
             android:id="@+id/startButton"
             style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.4"
+            android:layout_weight="0.5"
             android:drawableLeft="@drawable/ic_play_arrow_24dp"
+            android:gravity="center"
             android:onClick="containerStart"
             android:paddingStart="16dp"
             android:paddingLeft="16dp"
@@ -57,13 +64,19 @@
             android:paddingRight="16dp"
             android:text="@string/menu_start" />
 
+        <View
+            android:layout_width="12dp"
+            android:layout_height="match_parent"
+            android:background="?android:attr/colorBackground" />
+
         <Button
             android:id="@+id/stopButton"
             style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_weight="0.4"
+            android:layout_weight="0.5"
             android:drawableLeft="@drawable/ic_stop_24dp"
+            android:gravity="center"
             android:onClick="containerStop"
             android:paddingStart="16dp"
             android:paddingLeft="16dp"
@@ -71,15 +84,10 @@
             android:paddingRight="16dp"
             android:text="@string/menu_stop" />
 
-        <ImageButton
-            android:id="@+id/propertiesButton"
-            style="@style/Widget.AppCompat.Button.Borderless"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.2"
-            android:contentDescription="@string/menu_properties"
-            android:onClick="containerProperties"
-            android:src="@drawable/ic_tune_24dp" />
+        <View
+            android:layout_width="12dp"
+            android:layout_height="match_parent"
+            android:background="?android:attr/colorBackground" />
 
     </LinearLayout>
 

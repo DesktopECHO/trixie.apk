@@ -156,7 +156,7 @@
 
     <!-- INSTALL -->
     <string name="title_install_dialog">Install</string>
-    <string name="message_install_dialog">Start Debian 13 (Trixie) install?\n\nThis will overwrite any previously created deployment.</string>
+    <string name="message_install_dialog">Start Debian 13 (Trixie) install?</string>
     <!-- CONFIGURE -->
     <string name="title_configure_dialog">Configure</string>
     <string name="message_configure_dialog">Start configuration of the container?</string>

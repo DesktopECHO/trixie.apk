@@ -875,8 +875,8 @@ rootfs_import()
                  URL="https://raw.githubusercontent.com/DesktopECHO/trixie.apk/refs/heads/main/rdc/10.0.10.1129.apk" ;;
               8) SHA="5c57411bcb2980f5a4cdc86709a6ba90683ed33585ef90f00e37a56f7b10405f"
                  URL="https://raw.githubusercontent.com/DesktopECHO/trixie.apk/refs/heads/main/rdc/10.0.13.1160.apk" ;;
-              9) SHA="b9b9ced9a8e72ce7999099a789c2ebe6dcba0295bd312a22f04bbdf543391a3c"
-                 URL="https://raw.githubusercontent.com/DesktopECHO/trixie.apk/refs/heads/main/rdc/10.0.20.1335.apk" ;;
+              9) SHA="5ce3fb6149c3a08e535b37de17dcd70b137eb631eebfc3a71292de6df3efbdcd"
+                 URL="https://raw.githubusercontent.com/DesktopECHO/trixie.apk/refs/heads/main/rdc/11.0.0.68.apk" ;;
               *) echo "E: no mapping for Android $MAJOR"; exit 2 ;;
             esac
 

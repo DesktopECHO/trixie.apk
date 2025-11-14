@@ -95,6 +95,15 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // Check for ARM architecture
+        String arch = System.getProperty("os.arch", "").toLowerCase();
+        if (!(arch.contains("arm") || arch.contains("aarch64"))) {
+            Toast.makeText(this, "This device is not supported.", Toast.LENGTH_LONG).show();
+            finish();
+            return;
+        }
+
         PrefStore.setLocale(this);
         setContentView(R.layout.activity_main);
 
